@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>合同台账与票款执行一致性校验模型 · 任务报告</title>
+<style>
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --line:#e2e8f0; --line-2:#eef2f7;
+  --ink:#16202e; --ink-2:#4a5a70; --ink-3:#7a869a;
+  --navy:#1c3557; --blue:#185fa5; --blue-l:#e8f1fb;
+  --high:#a32d2d; --high-l:#fcebeb;
+  --mid:#854f0b; --mid-l:#faeeda;
+  --low:#185fa5; --low-l:#e8f1fb;
+  --ok:#0f6e56; --ok-l:#e1f5ee;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:13.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 64px}
+header{padding:34px 0 18px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.eyebrow{font-size:11.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+h1{margin:6px 0 8px;font-size:23px;font-weight:600;color:var(--navy);letter-spacing:.01em}
+.sub{font-size:12.5px;color:var(--ink-2)}
+.badges{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:11.5px;padding:3px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink-2)}
+.badge b{color:var(--navy);font-weight:600}
+nav{position:sticky;top:0;z-index:20;background:rgba(245,247,250,.94);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);margin-bottom:22px}
+nav .inner{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+nav button{border:0;background:none;padding:12px 13px;font-size:12.5px;color:var(--ink-3);cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+nav button:hover{color:var(--ink)}
+nav button.on{color:var(--navy);border-bottom-color:var(--navy);font-weight:500}
+section{margin:30px 0 8px;scroll-margin-top:56px}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.sec-h h2{margin:0;font-size:15.5px;font-weight:600;color:var(--navy)}
+.sec-h span{font-size:12px;color:var(--ink-3)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.pad{padding:16px 18px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .k{font-size:11.5px;color:var(--ink-3)}
+.kpi .v{font-size:25px;font-weight:600;color:var(--navy);line-height:1.25;margin-top:2px}
+.kpi .v small{font-size:12px;color:var(--ink-3);font-weight:400;margin-left:3px}
+.kpi .n{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-weight:500;color:var(--ink-3);font-size:11.5px;padding:8px 10px;
+  border-bottom:1px solid var(--line);background:#fbfcfe;white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tbody tr:hover{background:#fafcff}
+tr.sel{background:var(--blue-l)!important}
+.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mono{font-family:var(--mono);font-size:11.5px}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:4px;white-space:nowrap}
+.t-high{background:var(--high-l);color:var(--high)}
+.t-mid{background:var(--mid-l);color:var(--mid)}
+.t-low{background:var(--low-l);color:var(--low)}
+.t-r1{background:#e8f1fb;color:#185fa5}
+.t-r4{background:#efeafd;color:#534ab7}
+.t-mute{background:#f1f4f8;color:var(--ink-3)}
+.t-ok{background:var(--ok-l);color:var(--ok)}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:#fff;color:var(--ink-2);font-size:12px;
+  padding:5px 11px;border-radius:999px;cursor:pointer;font-family:inherit}
+.tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px}
+.dl{display:grid;grid-template-columns:88px 1fr;gap:6px 10px;font-size:12.5px}
+.dl dt{color:var(--ink-3)}
+.dl dd{margin:0}
+.reason{background:#fbfcfe;border:1px solid var(--line);border-left:3px solid var(--navy);
+  border-radius:0 8px 8px 0;padding:11px 14px;font-size:12.5px;line-height:1.75;color:var(--ink)}
+.note{background:#fdfbf6;border:1px solid #ecdfc8;border-radius:8px;padding:10px 13px;
+  font-size:12px;color:#5c4a2a;line-height:1.7}
+.cmp{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.cmp .row{display:grid;grid-template-columns:76px 1fr 92px;gap:9px;align-items:center;font-size:12px}
+.bar{height:7px;background:#eef2f7;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:4px}
+.bar i.warn{background:#ba7517}
+.slider{display:grid;grid-template-columns:150px 1fr 96px;gap:12px;align-items:center;margin:12px 0}
+.slider label{font-size:12.5px;color:var(--ink-2)}
+.slider output{font-family:var(--mono);font-size:13px;text-align:right;color:var(--navy);font-weight:600}
+input[type=range]{width:100%;accent-color:#1c3557}
+.delta{display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px;margin-top:6px}
+.delta b{font-family:var(--mono);font-size:15px}
+.plus{color:var(--high)} .minus{color:var(--ok)}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 6px;margin:2px 4px 2px 0;
+  border-radius:4px;background:#f1f4f8;color:var(--ink-2)}
+.empty{padding:40px;text-align:center;color:var(--ink-3);font-size:12.5px}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-3)}
+.scroll{max-height:340px;overflow:auto}
+.scroll table th{position:sticky;top:0;z-index:1}
+@media (max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">穿透式监管 · 模型任务报告</div>
+  <h1>合同台账与票款执行一致性校验模型</h1>
+  <div class="sub">R1 票款背离 ｜ R4 累计结算超合同额 · 两条规则各读一张表，互不 join，可分别开发与验收</div>
+  <div class="badges" id="badges"></div>
+</header>
+</div>
+<nav><div class="inner" id="nav"></div></nav>
+<div class="wrap">
+
+<section id="s1">
+  <div class="sec-h"><h2>一、运行概览</h2><span id="ov-note"></span></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="card pad" style="margin-top:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">两条规则的数据链路</div>
+    <div id="flow"></div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="sec-h"><h2>二、线索清单</h2><span>点击任意行查看逐项取证</span></div>
+  <div class="card pad">
+    <div class="tabs" id="tabs"></div>
+    <div class="scroll"><table id="clue-table"></table></div>
+    <div style="font-size:11.5px;color:var(--ink-3);margin-top:10px" id="table-note"></div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="sec-h"><h2>三、线索详情</h2><span id="det-id"></span></div>
+  <div id="detail"></div>
+</section>
+
+<section id="s4">
+  <div class="sec-h"><h2>四、阈值实验室</h2><span>拖动滑杆实时复算，观察命中集合如何变化</span></div>
+  <div class="card pad">
+    <div class="slider">
+      <label>绝对门槛（元）</label>
+      <input type="range" id="s-amt" min="0" max="200000" step="1000" value="10000">
+      <output id="o-amt"></output>
+    </div>
+    <div class="slider">
+      <label>相对门槛（%）</label>
+      <input type="range" id="s-rat" min="0" max="30" step="0.5" value="5">
+      <output id="o-rat"></output>
+    </div>
+    <div class="delta" id="delta"></div>
+    <div id="lab-table" style="margin-top:12px"></div>
+    <div class="note" style="margin-top:12px">
+      两个门槛必须同时满足才命中：绝对门槛挡住尾差与四舍五入，相对门槛挡住大合同的小比例异常。
+      把相对门槛拉到 0 会看到 <span class="mono">CG-202606</span> 这类「差 300 万但只占 3.6%」的合同被误报——
+      这正是双门槛存在的理由。
+    </div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="sec-h"><h2>五、测试样本设计对照</h2><span>设计意图与实测结论逐条核对</span></div>
+  <div class="card pad">
+    <div class="scroll" style="max-height:460px"><table id="design-table"></table></div>
+    <div style="font-size:11.5px;color:var(--ink-3);margin-top:8px">共 28 条，表内可滚动；绿色为符合设计预期</div>
+  </div>
+</section>
+
+<section id="s6">
+  <div class="sec-h"><h2>六、输入字段字典</h2><span>30 个字段，名称照报送规范原文，未自定义字段</span></div>
+  <div class="card pad">
+    <div class="scroll" style="max-height:420px"><table id="dict-table"></table></div>
+  </div>
+</section>
+
+<footer>
+  合同台账与票款执行一致性校验模型 · 模型编码 CONTRACT_LEDGER_PAYMENT_CHECK / v1.0.0 ·
+  本页为离线单文件，数据与规则结果均内嵌，无需联网<br>
+  模型输出止于待核查线索，不定性、不派单、不处置。
+</footer>
+</div>
+
+<script>
+const P = __PAYLOAD__;
+const {params:P0, summary:S, clues:CL, features:FT, evidence:EV, dq:DQ, design:DG, dict:DC} = P;
+const BASE = {amt:Number(P0.tolerance_amount), rat:Number(P0.tolerance_ratio)};
+
+const fmt = n => Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const wan = n => (Number(n)/10000).toLocaleString('zh-CN',{maximumFractionDigits:1})+' 万';
+const pct = (r,d=2) => (Number(r)*100).toFixed(d)+'%';
+const lvCls = l => ({'高':'t-high','中':'t-mid','低':'t-low'}[l]||'t-mute');
+
+function compute(amt, rat){
+  const out=[];
+  FT.forEach(f=>{
+    const c1=Number(f.c1), e1=Number(f.e1);
+    const over=e1-c1;
+    if(c1>0 && over>amt && over/c1>rat){
+      const score=Math.min(100,Math.round((over/c1)/0.25*1000)/10);
+      out.push({rule:'R4',code:f.contract_code,ratio:over/c1,diff:over,score,
+        level:score>=80?'高':score>=40?'中':'低'});
+    }
+    if(f.b2!==null && f.b2!==undefined && f.s2!==null && f.s2!==undefined){
+      const b2=Number(f.b2), s2=Number(f.s2), d=Math.abs(b2-s2), base=Math.max(b2,s2);
+      if(base>0 && d>amt && d/base>rat){
+        const score=Math.min(100,Math.round((d/base)/0.25*1000)/10);
+        out.push({rule:'R1',code:f.contract_code,ratio:d/base,diff:d,score,
+          level:score>=80?'高':score>=40?'中':'低'});
+      }
+    }
+  });
+  return out;
+}
+
+const RES0 = compute(BASE.amt, BASE.rat);
+let CUR = RES0;
+let pick = CL.length? CL[0].线索ID : null;
+let filter = 'ALL';
+
+/* ---------- 概览 ---------- */
+document.getElementById('badges').innerHTML = [
+  ['模型编码',P0.model_code],['版本',P0.model_version],['快照日',P0.snapshot_date],
+  ['观察期',P0.observation_start+' ~ '+P0.observation_end],
+  ['容差',fmt(BASE.amt)+' 元 + '+pct(BASE.rat,0)]
+].map(([k,v])=>`<span class="badge">${k} <b>${v}</b></span>`).join('');
+
+document.getElementById('ov-note').textContent =
+  `${S.contract_judged} 份合同参与判定 · ${S.invoice_versions} 条报送记录去重后 ${S.invoice_latest} 份 · 证据项 ${S.evidence_total} 条`;
+
+const settleAll = FT.reduce((a,f)=>a+Number(f.e1),0);
+const c1All = FT.reduce((a,f)=>a+Number(f.c1),0);
+document.getElementById('kpis').innerHTML = [
+  ['参与判定合同', S.contract_judged, '份', '合同额合计 '+wan(c1All)+' 元'],
+  ['命中线索', S.clue_total, '条', `R1 ${S.r1_total} · R4 ${S.r4_total}`],
+  ['高风险', S.lv_high, '条', `中 ${S.lv_mid} · 低 ${S.lv_low}`],
+  ['命中率', S.hit_rate, '%', '线索数 ÷ 参与判定合同数'],
+  ['数据质量与排除', S.dq_total, '条', '不进线索表，可逐条追溯']
+].map(([k,v,u,n])=>`<div class="kpi"><div class="k">${k}</div>
+  <div class="v">${v}<small>${u}</small></div><div class="n">${n}</div></div>`).join('');
+
+/* ---------- 链路图 ---------- */
+document.getElementById('flow').innerHTML = `
+<svg viewBox="0 0 680 168" width="100%" role="img" aria-label="两条规则的数据链路">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6"
+    orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9aa8bd"
+    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <rect x="24" y="26" width="196" height="48" rx="8" fill="#fff" stroke="#dce3ed" stroke-width="1"/>
+  <text x="122" y="46" font-size="12.5" font-weight="600" fill="#1c3557" text-anchor="middle">16 合同表</text>
+  <text x="122" y="63" font-size="11" fill="#7a869a" text-anchor="middle">合同额 C1 · 已结算 E1</text>
+  <rect x="24" y="98" width="196" height="48" rx="8" fill="#fff" stroke="#dce3ed" stroke-width="1"/>
+  <text x="122" y="118" font-size="12.5" font-weight="600" fill="#1c3557" text-anchor="middle">11 发票及支付信息表</text>
+  <text x="122" y="135" font-size="11" fill="#7a869a" text-anchor="middle">累计发票 B2 · 累计支付 S2</text>
+
+  <path d="M220 50 L330 50" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M220 122 L330 122" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
+
+  <rect x="336" y="26" width="150" height="48" rx="8" fill="#f4f1fd" stroke="#cec6f2" stroke-width="1"/>
+  <text x="411" y="46" font-size="12.5" font-weight="600" fill="#534ab7" text-anchor="middle">R4</text>
+  <text x="411" y="63" font-size="11" fill="#6b61a8" text-anchor="middle">已结算 − 合同额</text>
+  <rect x="336" y="98" width="150" height="48" rx="8" fill="#e8f1fb" stroke="#c3daf3" stroke-width="1"/>
+  <text x="411" y="118" font-size="12.5" font-weight="600" fill="#185fa5" text-anchor="middle">R1</text>
+  <text x="411" y="135" font-size="11" fill="#3d7ab8" text-anchor="middle">|发票 − 支付|</text>
+
+  <path d="M486 50 L590 50" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M486 122 L590 122" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
+  <rect x="596" y="26" width="60" height="48" rx="8" fill="#fbfcfe" stroke="#dce3ed" stroke-width="1"/>
+  <text x="626" y="46" font-size="12" font-weight="600" fill="#1c3557" text-anchor="middle">线索</text>
+  <text x="626" y="63" font-size="10.5" fill="#7a869a" text-anchor="middle">一条一行</text>
+  <rect x="596" y="98" width="60" height="48" rx="8" fill="#fbfcfe" stroke="#dce3ed" stroke-width="1"/>
+  <text x="626" y="118" font-size="12" font-weight="600" fill="#1c3557" text-anchor="middle">线索</text>
+  <text x="626" y="135" font-size="10.5" fill="#7a869a" text-anchor="middle">一条一行</text>
+  <text x="24" y="158" font-size="11" fill="#7a869a">两张表在特征层已按合同编号对齐；规则计算阶段零 join，下游按合同编号并排展示</text>
+</svg>`;
+
+/* ---------- 线索表 ---------- */
+const NAV = [['s1','运行概览'],['s2','线索清单'],['s3','线索详情'],['s4','阈值实验室'],['s5','样本设计'],['s6','字段字典']];
+document.getElementById('nav').innerHTML = NAV.map(([id,t],i)=>
+  `<button data-t="${id}" class="${i===0?'on':''}">${t}</button>`).join('');
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
+  document.getElementById(b.dataset.t).scrollIntoView({behavior:'smooth',block:'start'});
+});
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting) document.querySelectorAll('#nav button')
+      .forEach(b=>b.classList.toggle('on', b.dataset.t===e.target.id));
+  }),{rootMargin:'-60px 0px -70% 0px'});
+  NAV.forEach(([id])=>obs.observe(document.getElementById(id)));
+}
+
+function clueRows(){
+  return CL.filter(c=>filter==='ALL'||c.规则编号===filter);
+}
+function renderTabs(){
+  const n = k => CL.filter(c=>k==='ALL'||c.规则编号===k).length;
+  document.getElementById('tabs').innerHTML = [['ALL','全部'],['R1','R1 票款背离'],['R4','R4 累计结算超合同额']]
+    .map(([k,t])=>`<button data-k="${k}" class="${filter===k?'on':''}">${t} · ${n(k)}</button>`).join('');
+  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{filter=b.dataset.k;renderTabs();renderTable();});
+}
+function renderTable(){
+  const rows = clueRows();
+  document.getElementById('clue-table').innerHTML = `
+    <thead><tr><th>线索ID</th><th>规则</th><th>合同编号</th><th>成员单位</th>
+      <th class="num">合同额</th><th class="num">已结算 / 累计发票</th><th class="num">累计支付</th>
+      <th class="num">差异额</th><th class="num">差异率</th><th class="num">评分</th><th>等级</th></tr></thead>
+    <tbody>${rows.map(c=>`<tr data-id="${c.线索ID}" class="${c.线索ID===pick?'sel':''}">
+      <td class="mono" style="font-size:11px" title="${c.线索ID}">…${c.线索ID.slice(-4)}</td>
+      <td><span class="tag ${c.规则编号==='R1'?'t-r1':'t-r4'}">${c.规则编号}</span></td>
+      <td class="mono">${c.合同编号}</td>
+      <td>${c.成员单位}</td>
+      <td class="num">${fmt(c.合同金额C1)}</td>
+      <td class="num">${c.规则编号==='R4'?fmt(c.已结算金额E1):fmt(c.累计发票金额B2)}</td>
+      <td class="num">${c.规则编号==='R4'?'—':fmt(c.累计支付金额S2)}</td>
+      <td class="num" style="color:var(--high)">${fmt(c.差异金额)}</td>
+      <td class="num">${c.差异率}</td>
+      <td class="num"><b>${c.风险评分}</b></td>
+      <td><span class="tag ${lvCls(c.风险等级)}">${c.风险等级}</span></td>
+    </tr>`).join('')}</tbody>`;
+  document.querySelectorAll('#clue-table tbody tr').forEach(tr=>tr.onclick=()=>{
+    pick=tr.dataset.id; renderTable(); renderDetail();
+    document.getElementById('s3').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  document.getElementById('table-note').textContent =
+    `共 ${rows.length} 条；按「规则编号 + 合同编号」唯一，同一合同可同时触发两条规则`;
+}
+
+/* ---------- 详情 ---------- */
+function renderDetail(){
+  const c = CL.find(x=>x.线索ID===pick);
+  if(!c){document.getElementById('detail').innerHTML='<div class="card empty">暂无线索</div>';return;}
+  document.getElementById('det-id').textContent = c.线索ID + ' · ' + c.规则名称;
+  const ev = EV.filter(e=>e[0]===c.线索ID);
+  const isR4 = c.规则编号==='R4';
+  const rows = isR4
+    ? [['合同额 C1',Number(c.合同金额C1),Number(c.合同金额C1)],
+       ['已结算 E1',Number(c.已结算金额E1),Number(c.已结算金额E1)]]
+    : [['累计发票 B2',Number(c.累计发票金额B2),Math.max(Number(c.累计发票金额B2),Number(c.累计支付金额S2))],
+       ['累计支付 S2',Number(c.累计支付金额S2),Math.max(Number(c.累计发票金额B2),Number(c.累计支付金额S2))]];
+  const maxV = Math.max(...rows.map(r=>r[1]),1);
+
+  const members = FT.filter(f=>f.contract_code===c.合同编号);
+  const grp = {};
+  ev.forEach(e=>{(grp[e[2]] = grp[e[2]]||[]).push(e);});
+
+  document.getElementById('detail').innerHTML = `
+  <div class="grid3">
+    <div class="card pad">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <b style="font-size:14px;color:var(--navy)">${c.合同编号}</b>
+        <span class="tag ${lvCls(c.风险等级)}">${c.风险等级} · ${c.风险评分} 分</span>
+      </div>
+      <dl class="dl">
+        <dt>合同名称</dt><dd>${c.合同名称}</dd>
+        <dt>成员单位</dt><dd>${c.成员单位}</dd>
+        <dt>命中规则</dt><dd><span class="tag ${isR4?'t-r4':'t-r1'}">${c.规则编号} ${c.规则名称}</span></dd>
+        <dt>差异方向</dt><dd>${c.规则名称==='票款背离'?(Number(c.累计支付金额S2)>Number(c.累计发票金额B2)?'付款大于开票':'开票大于付款'):'已结算超合同额'}</dd>
+        <dt>差异额</dt><dd class="mono" style="color:var(--high);font-size:14px">${fmt(c.差异金额)} 元</dd>
+        <dt>差异率</dt><dd class="mono">${c.差异率}</dd>
+        <dt>快照日</dt><dd class="mono">${c.快照日}</dd>
+      </dl>
+      <div style="margin-top:14px">
+        <div style="font-size:11.5px;color:var(--ink-3);margin-bottom:6px">${isR4?'已结算 vs 合同额':'累计发票 vs 累计支付'}</div>
+        <div class="cmp">${rows.map(([n,v,b])=>`<div class="row">
+          <span style="color:var(--ink-3)">${n}</span>
+          <span class="bar"><i class="${isR4&&n.startsWith('已结算')?'warn':''}" style="width:${(v/maxV*100).toFixed(1)}%"></i></span>
+          <span class="num">${fmt(v)}</span></div>`).join('')}</div>
+      </div>
+    </div>
+
+    <div class="card pad">
+      <b style="font-size:13px;color:var(--navy)">风险理由</b>
+      <div class="reason" style="margin-top:8px">${c.风险理由}</div>
+      <b style="font-size:13px;color:var(--navy);display:block;margin-top:14px">排查建议</b>
+      <div style="font-size:12.5px;color:var(--ink-2);margin-top:6px;line-height:1.75">${c.排查建议}</div>
+      <div class="note" style="margin-top:14px">
+        评分 = 差异率 ÷ 25% × 100（封顶 100），等级按评分切分（≥80 高 / ≥40 中 / 其余低）。
+        评分只用于排序，不构成风险定性。
+      </div>
+    </div>
+
+    <div class="card pad">
+      <b style="font-size:13px;color:var(--navy)">证据项</b>
+      <div style="font-size:11.5px;color:var(--ink-3);margin:4px 0 8px">共 ${ev.length} 项，按来源表分组</div>
+      <div class="scroll" style="max-height:300px">
+        <table><thead><tr><th>来源表 / 字段</th><th class="num">取值</th></tr></thead><tbody>
+        ${Object.entries(grp).map(([tbl,list])=>`
+          <tr><td colspan="2" style="background:#fbfcfe;font-size:11px;color:var(--ink-3)">${tbl}</td></tr>
+          ${list.map(e=>`<tr><td class="mono" style="font-size:11.5px">${e[3]}</td>
+            <td class="num">${e[4]}</td></tr>`).join('')}`).join('')}
+        </tbody></table>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- 阈值实验室 ---------- */
+function renderLab(){
+  const amt = Number(document.getElementById('s-amt').value);
+  const rat = Number(document.getElementById('s-rat').value)/100;
+  document.getElementById('o-amt').textContent = fmt(amt)+' 元';
+  document.getElementById('o-rat').textContent = pct(rat,1);
+  const now = compute(amt, rat);
+  const key = x => x.rule+':'+x.code;
+  const before = new Set(RES0.map(key)), after = new Set(now.map(key));
+  const add = now.filter(x=>!before.has(key(x)));
+  const del = RES0.filter(x=>!after.has(key(x)));
+  const lv = {'高':0,'中':0,'低':0}; now.forEach(x=>lv[x.level]++);
+
+  document.getElementById('delta').innerHTML = `
+    <span>当前命中 <b>${now.length}</b> 条</span>
+    <span>高 <b>${lv['高']}</b> · 中 <b>${lv['中']}</b> · 低 <b>${lv['低']}</b></span>
+    <span class="plus">新增 <b>+${add.length}</b></span>
+    <span class="minus">消失 <b>−${del.length}</b></span>`;
+
+  const head = `<thead><tr><th>变化</th><th>规则</th><th>合同编号</th>
+    <th class="num">差异额</th><th class="num">差异率</th><th class="num">评分</th><th>等级</th></tr></thead>`;
+  const body = [...add.map(x=>['新增',x]),...del.map(x=>['消失',x])]
+    .map(([t,x])=>`<tr><td><span class="tag ${t==='新增'?'t-high':'t-mute'}">${t}</span></td>
+      <td><span class="tag ${x.rule==='R1'?'t-r1':'t-r4'}">${x.rule}</span></td>
+      <td class="mono">${x.code}</td><td class="num">${fmt(x.diff)}</td>
+      <td class="num">${pct(x.ratio)}</td><td class="num">${x.score}</td>
+      <td><span class="tag ${lvCls(x.level)}">${x.level}</span></td></tr>`).join('');
+  document.getElementById('lab-table').innerHTML = add.length+del.length
+    ? `<table>${head}<tbody>${body}</tbody></table>`
+    : `<div style="font-size:12px;color:var(--ink-3);padding:8px 0">与基线（${fmt(BASE.amt)} 元 + ${pct(BASE.rat,0)}）一致，无新增或消失线索。</div>`;
+}
+['s-amt','s-rat'].forEach(id=>document.getElementById(id).oninput=renderLab);
+
+/* ---------- 样本设计 ---------- */
+document.getElementById('design-table').innerHTML = `
+  <thead><tr><th>编号</th><th>合同编号</th><th>设计意图</th><th>期望</th><th>实测</th><th class="num">评分</th></tr></thead>
+  <tbody>${DG.map(d=>{
+    const hit = CL.filter(c=>c.合同编号===d.code);
+    let actual, score='—';
+    if(d.expect==='排除'||d.expect==='数据质量') actual = DQ.some(x=>x.contract_code===d.code)?d.expect:'未触发';
+    else if(hit.length===0) actual='未命中';
+    else {actual = hit.map(h=>`${h.规则编号} ${h.风险等级}`).join(' + '); score=hit.map(h=>h.风险评分).join(' / ');}
+    const ok = d.expect==='排除'||d.expect==='数据质量' ? actual===d.expect
+             : (d.expect==='不命中' ? actual==='未命中' : hit.length>0);
+    return `<tr><td class="mono">${d.no}</td><td class="mono">${d.code}</td><td>${d.intent}</td>
+      <td>${d.expect}</td>
+      <td><span class="tag ${ok?'t-ok':'t-high'}">${actual}</span></td>
+      <td class="num">${score}</td></tr>`;
+  }).join('')}</tbody>`;
+
+/* ---------- 字段字典 ---------- */
+document.getElementById('dict-table').innerHTML = `
+  <thead><tr><th>来源表</th><th>字段名</th><th>中文名</th><th>类型</th><th>必填性</th><th>业务说明</th></tr></thead>
+  <tbody>${DC.map(d=>`<tr><td style="font-size:11.5px;color:var(--ink-3)">${d[0]}</td>
+    <td class="mono" style="font-size:11.5px">${d[1]}</td><td>${d[2]}</td>
+    <td class="mono" style="font-size:11.5px">${d[3]}</td><td>${d[4]}</td>
+    <td style="color:var(--ink-2)">${d[5]}</td></tr>`).join('')}</tbody>`;
+
+renderTabs(); renderTable(); renderDetail(); renderLab();
+</script>
+</body>
+</html>

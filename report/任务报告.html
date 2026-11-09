@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>合同台账与票款执行一致性校验模型 · 任务报告</title>
+<style>
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --line:#e2e8f0; --line-2:#eef2f7;
+  --ink:#16202e; --ink-2:#4a5a70; --ink-3:#7a869a;
+  --navy:#1c3557; --blue:#185fa5; --blue-l:#e8f1fb;
+  --high:#a32d2d; --high-l:#fcebeb;
+  --mid:#854f0b; --mid-l:#faeeda;
+  --low:#185fa5; --low-l:#e8f1fb;
+  --ok:#0f6e56; --ok-l:#e1f5ee;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:13.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 64px}
+header{padding:34px 0 18px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.eyebrow{font-size:11.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+h1{margin:6px 0 8px;font-size:23px;font-weight:600;color:var(--navy);letter-spacing:.01em}
+.sub{font-size:12.5px;color:var(--ink-2)}
+.badges{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:11.5px;padding:3px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink-2)}
+.badge b{color:var(--navy);font-weight:600}
+nav{position:sticky;top:0;z-index:20;background:rgba(245,247,250,.94);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);margin-bottom:22px}
+nav .inner{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+nav button{border:0;background:none;padding:12px 13px;font-size:12.5px;color:var(--ink-3);cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+nav button:hover{color:var(--ink)}
+nav button.on{color:var(--navy);border-bottom-color:var(--navy);font-weight:500}
+section{margin:30px 0 8px;scroll-margin-top:56px}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.sec-h h2{margin:0;font-size:15.5px;font-weight:600;color:var(--navy)}
+.sec-h span{font-size:12px;color:var(--ink-3)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.pad{padding:16px 18px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .k{font-size:11.5px;color:var(--ink-3)}
+.kpi .v{font-size:25px;font-weight:600;color:var(--navy);line-height:1.25;margin-top:2px}
+.kpi .v small{font-size:12px;color:var(--ink-3);font-weight:400;margin-left:3px}
+.kpi .n{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-weight:500;color:var(--ink-3);font-size:11.5px;padding:8px 10px;
+  border-bottom:1px solid var(--line);background:#fbfcfe;white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tbody tr:hover{background:#fafcff}
+tr.sel{background:var(--blue-l)!important}
+.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mono{font-family:var(--mono);font-size:11.5px}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:4px;white-space:nowrap}
+.t-high{background:var(--high-l);color:var(--high)}
+.t-mid{background:var(--mid-l);color:var(--mid)}
+.t-low{background:var(--low-l);color:var(--low)}
+.t-r1{background:#e8f1fb;color:#185fa5}
+.t-r4{background:#efeafd;color:#534ab7}
+.t-mute{background:#f1f4f8;color:var(--ink-3)}
+.t-ok{background:var(--ok-l);color:var(--ok)}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:#fff;color:var(--ink-2);font-size:12px;
+  padding:5px 11px;border-radius:999px;cursor:pointer;font-family:inherit}
+.tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px}
+.dl{display:grid;grid-template-columns:88px 1fr;gap:6px 10px;font-size:12.5px}
+.dl dt{color:var(--ink-3)}
+.dl dd{margin:0}
+.reason{background:#fbfcfe;border:1px solid var(--line);border-left:3px solid var(--navy);
+  border-radius:0 8px 8px 0;padding:11px 14px;font-size:12.5px;line-height:1.75;color:var(--ink)}
+.note{background:#fdfbf6;border:1px solid #ecdfc8;border-radius:8px;padding:10px 13px;
+  font-size:12px;color:#5c4a2a;line-height:1.7}
+.cmp{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.cmp .row{display:grid;grid-template-columns:76px 1fr 92px;gap:9px;align-items:center;font-size:12px}
+.bar{height:7px;background:#eef2f7;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:4px}
+.bar i.warn{background:#ba7517}
+.slider{display:grid;grid-template-columns:150px 1fr 96px;gap:12px;align-items:center;margin:12px 0}
+.slider label{font-size:12.5px;color:var(--ink-2)}
+.slider output{font-family:var(--mono);font-size:13px;text-align:right;color:var(--navy);font-weight:600}
+input[type=range]{width:100%;accent-color:#1c3557}
+.delta{display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px;margin-top:6px}
+.delta b{font-family:var(--mono);font-size:15px}
+.plus{color:var(--high)} .minus{color:var(--ok)}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 6px;margin:2px 4px 2px 0;
+  border-radius:4px;background:#f1f4f8;color:var(--ink-2)}
+.empty{padding:40px;text-align:center;color:var(--ink-3);font-size:12.5px}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-3)}
+.scroll{max-height:340px;overflow:auto}
+.scroll table th{position:sticky;top:0;z-index:1}
+@media (max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">穿透式监管 · 模型任务报告</div>
+  <h1>合同台账与票款执行一致性校验模型</h1>
+  <div class="sub">R1 票款背离 ｜ R4 累计结算超合同额 · 两条规则各读一张表，互不 join，可分别开发与验收</div>
+  <div class="badges" id="badges"></div>
+</header>
+</div>
+<nav><div class="inner" id="nav"></div></nav>
+<div class="wrap">
+
+<section id="s1">
+  <div class="sec-h"><h2>一、运行概览</h2><span id="ov-note"></span></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="card pad" style="margin-top:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">两条规则的数据链路</div>
+    <div id="flow"></div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="sec-h"><h2>二、线索清单</h2><span>点击任意行查看逐项取证</span></div>
+  <div class="card pad">
+    <div class="tabs" id="tabs"></div>
+    <div class="scroll"><table id="clue-table"></table></div>
+    <div style="font-size:11.5px;color:var(--ink-3);margin-top:10px" id="table-note"></div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="sec-h"><h2>三、线索详情</h2><span id="det-id"></span></div>
+  <div id="detail"></div>
+</section>
+
+<section id="s4">
+  <div class="sec-h"><h2>四、阈值实验室</h2><span>拖动滑杆实时复算，观察命中集合如何变化</span></div>
+  <div class="card pad">
+    <div class="slider">
+      <label>绝对门槛（元）</label>
+      <input type="range" id="s-amt" min="0" max="200000" step="1000" value="10000">
+      <output id="o-amt"></output>
+    </div>
+    <div class="slider">
+      <label>相对门槛（%）</label>
+      <input type="range" id="s-rat" min="0" max="30" step="0.5" value="5">
+      <output id="o-rat"></output>
+    </div>
+    <div class="delta" id="delta"></div>
+    <div id="lab-table" style="margin-top:12px"></div>
+    <div class="note" style="margin-top:12px">
+      两个门槛必须同时满足才命中：绝对门槛挡住尾差与四舍五入，相对门槛挡住大合同的小比例异常。
+      把相对门槛拉到 0 会看到 <span class="mono">CG-202606</span> 这类「差 300 万但只占 3.6%」的合同被误报——
+      这正是双门槛存在的理由。
+    </div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="sec-h"><h2>五、测试样本设计对照</h2><span>设计意图与实测结论逐条核对</span></div>
+  <div class="card pad">
+    <div class="scroll" style="max-height:460px"><table id="design-table"></table></div>
+    <div style="font-size:11.5px;color:var(--ink-3);margin-top:8px">共 28 条，表内可滚动；绿色为符合设计预期</div>
+  </div>
+</section>
+
+<section id="s6">
+  <div class="sec-h"><h2>六、输入字段字典</h2><span>30 个字段，名称照报送规范原文，未自定义字段</span></div>
+  <div class="card pad">
+    <div class="scroll" style="max-height:420px"><table id="dict-table"></table></div>
+  </div>
+</section>
+
+<footer>
+  合同台账与票款执行一致性校验模型 · 模型编码 CONTRACT_LEDGER_PAYMENT_CHECK / v1.0.0 ·
+  本页为离线单文件，数据与规则结果均内嵌，无需联网<br>
+  模型输出止于待核查线索，不定性、不派单、不处置。
+</footer>
+</div>
+
+<script>
+const P = {"params": {"model_code": "CONTRACT_LEDGER_PAYMENT_CHECK", "model_version": "1.0.0", "snapshot_date": "2026-06-30", "observation_start": "2026-01-01", "observation_end": "2026-06-30", "tolerance_amount": 10000.0, "tolerance_ratio": 0.05, "framework_filter": "T00", "currency_filter": "CNY"}, "summary": {"contract_total": 87, "contract_judged": 84, "invoice_versions": 90, "invoice_latest": 87, "clue_total": 15, "r1_total": 10, "r4_total": 5, "lv_high": 4, "lv_mid": 7, "lv_low": 4, "dq_total": 8, "evidence_total": 210, "hit_rate": 17.9}, "clues": [{"线索ID": "CLUE-20260630-0001", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202613", "合同名称": "现场技术服务合同", "成员单位": "华衡工程建设有限公司", "合同类型": "N03", "合同金额C1": "500000.00", "已结算金额E1": "450000.00", "累计发票金额B2": "0.00", "累计支付金额S2": "450000.00", "差异金额": "450000.00", "差异率": "100.00%", "风险评分": "100.0", "风险等级": "高", "风险理由": "合同 CG-202613 累计支付 450,000.00 元，累计发票 0.00 元，付款大于开票 450,000.00 元（100.00%）。可能存在已付款未取得发票、预付款未冲销或供应商延迟开票。", "排查建议": "核查开票申请与实际到票情况；确认是否存在预付款条款；比对付款审批单与发票签收记录。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0002", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202615", "合同名称": "空冷岛设备采购合同", "成员单位": "华衡重工股份有限公司", "合同类型": "N01", "合同金额C1": "2400000.00", "已结算金额E1": "1500000.00", "累计发票金额B2": "1200000.00", "累计支付金额S2": "1600000.00", "差异金额": "400000.00", "差异率": "25.00%", "风险评分": "100.0", "风险等级": "高", "风险理由": "合同 CG-202615 累计支付 1,600,000.00 元，累计发票 1,200,000.00 元，付款大于开票 400,000.00 元（25.00%）。可能存在已付款未取得发票、预付款未冲销或供应商延迟开票。", "排查建议": "核查开票申请与实际到票情况；确认是否存在预付款条款；比对付款审批单与发票签收记录。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0003", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202627", "合同名称": "磨煤机备件采购合同", "成员单位": "华衡重工股份有限公司", "合同类型": "N01", "合同金额C1": "6000000.00", "已结算金额E1": "6000000.00", "累计发票金额B2": "6200000.00", "累计支付金额S2": "5000000.00", "差异金额": "1200000.00", "差异率": "19.35%", "风险评分": "77.4", "风险等级": "中", "风险理由": "合同 CG-202627 累计发票 6,200,000.00 元，累计支付 5,000,000.00 元，开票大于付款 1,200,000.00 元（19.35%）。可能存在先票后款、预开票或红冲未剔除。", "排查建议": "核对合同约定账期与付款节点；确认是否存在预开票；核实累计发票金额是否已剔除红冲与作废发票。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0004", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202614", "合同名称": "烟道防腐材料采购合同", "成员单位": "华衡物资贸易有限公司", "合同类型": "N01", "合同金额C1": "700000.00", "已结算金额E1": "620000.00", "累计发票金额B2": "620000.00", "累计支付金额S2": "500000.00", "差异金额": "120000.00", "差异率": "19.35%", "风险评分": "77.4", "风险等级": "中", "风险理由": "合同 CG-202614 累计发票 620,000.00 元，累计支付 500,000.00 元，开票大于付款 120,000.00 元（19.35%）。可能存在先票后款、预开票或红冲未剔除。", "排查建议": "核对合同约定账期与付款节点；确认是否存在预开票；核实累计发票金额是否已剔除红冲与作废发票。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0005", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202612", "合同名称": "除灰系统设备采购合同", "成员单位": "华衡能源装备有限公司", "合同类型": "N01", "合同金额C1": "5000000.00", "已结算金额E1": "3000000.00", "累计发票金额B2": "4800000.00", "累计支付金额S2": "4000000.00", "差异金额": "800000.00", "差异率": "16.67%", "风险评分": "66.7", "风险等级": "中", "风险理由": "合同 CG-202612 累计发票 4,800,000.00 元，累计支付 4,000,000.00 元，开票大于付款 800,000.00 元（16.67%）。可能存在先票后款、预开票或红冲未剔除。", "排查建议": "核对合同约定账期与付款节点；确认是否存在预开票；核实累计发票金额是否已剔除红冲与作废发票。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0006", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202611", "合同名称": "给水泵组采购合同", "成员单位": "华衡重工股份有限公司", "合同类型": "N01", "合同金额C1": "6000000.00", "已结算金额E1": "3000000.00", "累计发票金额B2": "3000000.00", "累计支付金额S2": "3500000.00", "差异金额": "500000.00", "差异率": "14.29%", "风险评分": "57.1", "风险等级": "中", "风险理由": "合同 CG-202611 累计支付 3,500,000.00 元，累计发票 3,000,000.00 元，付款大于开票 500,000.00 元（14.29%）。可能存在已付款未取得发票、预付款未冲销或供应商延迟开票。", "排查建议": "核查开票申请与实际到票情况；确认是否存在预付款条款；比对付款审批单与发票签收记录。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0007", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202628", "合同名称": "送风机设备采购合同", "成员单位": "华衡能源装备有限公司", "合同类型": "N01", "合同金额C1": "2000000.00", "已结算金额E1": "2200000.00", "累计发票金额B2": "1800000.00", "累计支付金额S2": "2000000.00", "差异金额": "200000.00", "差异率": "10.00%", "风险评分": "40.0", "风险等级": "中", "风险理由": "合同 CG-202628 累计支付 2,000,000.00 元，累计发票 1,800,000.00 元，付款大于开票 200,000.00 元（10.00%）。可能存在已付款未取得发票、预付款未冲销或供应商延迟开票。", "排查建议": "核查开票申请与实际到票情况；确认是否存在预付款条款；比对付款审批单与发票签收记录。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0008", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202616", "合同名称": "锅炉本体部件采购合同", "成员单位": "华衡能源装备有限公司", "合同类型": "N01", "合同金额C1": "9600000.00", "已结算金额E1": "5000000.00", "累计发票金额B2": "5300000.00", "累计支付金额S2": "4800000.00", "差异金额": "500000.00", "差异率": "9.43%", "风险评分": "37.7", "风险等级": "低", "风险理由": "合同 CG-202616 累计发票 5,300,000.00 元，累计支付 4,800,000.00 元，开票大于付款 500,000.00 元（9.43%）。可能存在先票后款、预开票或红冲未剔除。", "排查建议": "核对合同约定账期与付款节点；确认是否存在预开票；核实累计发票金额是否已剔除红冲与作废发票。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0009", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202617", "合同名称": "化学水处理设备采购合同", "成员单位": "华衡工程建设有限公司", "合同类型": "N01", "合同金额C1": "2000000.00", "已结算金额E1": "1000000.00", "累计发票金额B2": "1000000.00", "累计支付金额S2": "1080000.00", "差异金额": "80000.00", "差异率": "7.41%", "风险评分": "29.6", "风险等级": "低", "风险理由": "合同 CG-202617 累计支付 1,080,000.00 元，累计发票 1,000,000.00 元，付款大于开票 80,000.00 元（7.41%）。可能存在已付款未取得发票、预付款未冲销或供应商延迟开票。", "排查建议": "核查开票申请与实际到票情况；确认是否存在预付款条款；比对付款审批单与发票签收记录。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0010", "规则编号": "R1", "规则名称": "票款背离", "合同编号": "CG-202621", "合同名称": "除尘器本体采购合同", "成员单位": "华衡工程建设有限公司", "合同类型": "N01", "合同金额C1": "2000000.00", "已结算金额E1": "1000000.00", "累计发票金额B2": "2000000.00", "累计支付金额S2": "2110000.00", "差异金额": "110000.00", "差异率": "5.21%", "风险评分": "20.9", "风险等级": "低", "风险理由": "合同 CG-202621 累计支付 2,110,000.00 元，累计发票 2,000,000.00 元，付款大于开票 110,000.00 元（5.21%）。可能存在已付款未取得发票、预付款未冲销或供应商延迟开票。", "排查建议": "核查开票申请与实际到票情况；确认是否存在预付款条款；比对付款审批单与发票签收记录。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0011", "规则编号": "R4", "规则名称": "累计结算超合同额", "合同编号": "CG-202608", "合同名称": "脱硫系统设备采购合同", "成员单位": "华衡能源装备有限公司", "合同类型": "N01", "合同金额C1": "1200000.00", "已结算金额E1": "2400000.00", "累计发票金额B2": "2400000.00", "累计支付金额S2": "2400000.00", "差异金额": "1200000.00", "差异率": "100.00%", "风险评分": "100.0", "风险等级": "高", "风险理由": "合同 CG-202608 合同总金额 1,200,000.00 元，已结算金额 2,400,000.00 元，超合同额 1,200,000.00 元（100.00%）。已结算金额突破合同约定上限，可能存在未登记合同变更、超权限结算或重复结算。", "排查建议": "核查合同变更与补充协议是否已登记入账；核对结算审批权限与结算单金额；确认是否存在跨合同串用或重复结算。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0012", "规则编号": "R4", "规则名称": "累计结算超合同额", "合同编号": "CG-202609", "合同名称": "输煤系统安装工程合同", "成员单位": "华衡工程建设有限公司", "合同类型": "N04", "合同金额C1": "1600000.00", "已结算金额E1": "2000000.00", "累计发票金额B2": "1950000.00", "累计支付金额S2": "1900000.00", "差异金额": "400000.00", "差异率": "25.00%", "风险评分": "100.0", "风险等级": "高", "风险理由": "合同 CG-202609 合同总金额 1,600,000.00 元，已结算金额 2,000,000.00 元，超合同额 400,000.00 元（25.00%）。已结算金额突破合同约定上限，可能存在未登记合同变更、超权限结算或重复结算。", "排查建议": "核查合同变更与补充协议是否已登记入账；核对结算审批权限与结算单金额；确认是否存在跨合同串用或重复结算。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0013", "规则编号": "R4", "规则名称": "累计结算超合同额", "合同编号": "CG-202607", "合同名称": "环保岛改造工程合同", "成员单位": "华衡重工股份有限公司", "合同类型": "N04", "合同金额C1": "5000000.00", "已结算金额E1": "5500000.00", "累计发票金额B2": "5500000.00", "累计支付金额S2": "5500000.00", "差异金额": "500000.00", "差异率": "10.00%", "风险评分": "40.0", "风险等级": "中", "风险理由": "合同 CG-202607 合同总金额 5,000,000.00 元，已结算金额 5,500,000.00 元，超合同额 500,000.00 元（10.00%）。已结算金额突破合同约定上限，可能存在未登记合同变更、超权限结算或重复结算。", "排查建议": "核查合同变更与补充协议是否已登记入账；核对结算审批权限与结算单金额；确认是否存在跨合同串用或重复结算。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0014", "规则编号": "R4", "规则名称": "累计结算超合同额", "合同编号": "CG-202628", "合同名称": "送风机设备采购合同", "成员单位": "华衡能源装备有限公司", "合同类型": "N01", "合同金额C1": "2000000.00", "已结算金额E1": "2200000.00", "累计发票金额B2": "1800000.00", "累计支付金额S2": "2000000.00", "差异金额": "200000.00", "差异率": "10.00%", "风险评分": "40.0", "风险等级": "中", "风险理由": "合同 CG-202628 合同总金额 2,000,000.00 元，已结算金额 2,200,000.00 元，超合同额 200,000.00 元（10.00%）。已结算金额突破合同约定上限，可能存在未登记合同变更、超权限结算或重复结算。", "排查建议": "核查合同变更与补充协议是否已登记入账；核对结算审批权限与结算单金额；确认是否存在跨合同串用或重复结算。", "快照日": "2026-06-30"}, {"线索ID": "CLUE-20260630-0015", "规则编号": "R4", "规则名称": "累计结算超合同额", "合同编号": "CG-202610", "合同名称": "电气成套设备采购合同", "成员单位": "华衡物资贸易有限公司", "合同类型": "N01", "合同金额C1": "2500000.00", "已结算金额E1": "2650000.00", "累计发票金额B2": "2600000.00", "累计支付金额S2": "2600000.00", "差异金额": "150000.00", "差异率": "6.00%", "风险评分": "24.0", "风险等级": "低", "风险理由": "合同 CG-202610 合同总金额 2,500,000.00 元，已结算金额 2,650,000.00 元，超合同额 150,000.00 元（6.00%）。已结算金额突破合同约定上限，可能存在未登记合同变更、超权限结算或重复结算。", "排查建议": "核查合同变更与补充协议是否已登记入账；核对结算审批权限与结算单金额；确认是否存在跨合同串用或重复结算。", "快照日": "2026-06-30"}], "features": [{"contract_code": "CG-2025001", "contract_name": "磨煤机衬板采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-04-01", "c1": "200000.00", "e1": "40000.00", "b2": "35800.00", "s2": "36000.00", "has_nonsiku": true}, {"contract_code": "CG-2025002", "contract_name": "循环水泵采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-05-02", "c1": "237100.00", "e1": "64000.00", "b2": "58000.00", "s2": "58200.00", "has_nonsiku": true}, {"contract_code": "CG-2025003", "contract_name": "除盐水箱采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-06-03", "c1": "274300.00", "e1": "93200.00", "b2": "85600.00", "s2": "85700.00", "has_nonsiku": true}, {"contract_code": "CG-2025004", "contract_name": "烟风道补偿器采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-07-04", "c1": "311500.00", "e1": "127700.00", "b2": "118700.00", "s2": "118700.00", "has_nonsiku": true}, {"contract_code": "CG-2025005", "contract_name": "低压配电柜采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-08-05", "c1": "348700.00", "e1": "167300.00", "b2": "157300.00", "s2": "157200.00", "has_nonsiku": true}, {"contract_code": "CG-2025006", "contract_name": "热工电缆采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-09-06", "c1": "385900.00", "e1": "212200.00", "b2": "201900.00", "s2": "201500.00", "has_nonsiku": true}, {"contract_code": "CG-2025007", "contract_name": "除尘布袋采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-10-07", "c1": "423100.00", "e1": "262300.00", "b2": "252500.00", "s2": "251800.00", "has_nonsiku": true}, {"contract_code": "CG-2025008", "contract_name": "钢结构支架采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-11-08", "c1": "460300.00", "e1": "317600.00", "b2": "307000.00", "s2": "308000.00", "has_nonsiku": true}, {"contract_code": "CG-2025009", "contract_name": "化学加药装置采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-12-09", "c1": "497500.00", "e1": "378100.00", "b2": "369700.00", "s2": "370500.00", "has_nonsiku": true}, {"contract_code": "CG-2025010", "contract_name": "暖通空调机组采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-01-10", "c1": "534700.00", "e1": "443800.00", "b2": "399000.00", "s2": "399400.00", "has_nonsiku": true}, {"contract_code": "CG-2025011", "contract_name": "磨煤机衬板采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-02-11", "c1": "571900.00", "e1": "114300.00", "b2": "104000.00", "s2": "104000.00", "has_nonsiku": true}, {"contract_code": "CG-2025012", "contract_name": "循环水泵采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-03-12", "c1": "609100.00", "e1": "164400.00", "b2": "151300.00", "s2": "151200.00", "has_nonsiku": true}, {"contract_code": "CG-2025013", "contract_name": "除盐水箱采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-04-13", "c1": "646300.00", "e1": "219700.00", "b2": "204700.00", "s2": "204300.00", "has_nonsiku": true}, {"contract_code": "CG-2025014", "contract_name": "烟风道补偿器采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-05-14", "c1": "683500.00", "e1": "280200.00", "b2": "264000.00", "s2": "263300.00", "has_nonsiku": true}, {"contract_code": "CG-2025015", "contract_name": "低压配电柜采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-06-15", "c1": "720700.00", "e1": "345900.00", "b2": "327600.00", "s2": "328600.00", "has_nonsiku": true}, {"contract_code": "CG-2025016", "contract_name": "热工电缆采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-07-16", "c1": "757800.00", "e1": "416700.00", "b2": "399200.00", "s2": "400000.00", "has_nonsiku": true}, {"contract_code": "CG-2025017", "contract_name": "除尘布袋采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-08-17", "c1": "795000.00", "e1": "492900.00", "b2": "477600.00", "s2": "478100.00", "has_nonsiku": true}, {"contract_code": "CG-2025018", "contract_name": "钢结构支架采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-09-18", "c1": "832200.00", "e1": "574200.00", "b2": "562700.00", "s2": "562700.00", "has_nonsiku": true}, {"contract_code": "CG-2025019", "contract_name": "化学加药装置采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-10-19", "c1": "869400.00", "e1": "660700.00", "b2": "595100.00", "s2": "594600.00", "has_nonsiku": true}, {"contract_code": "CG-2025020", "contract_name": "暖通空调机组采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-11-20", "c1": "906600.00", "e1": "752400.00", "b2": "685900.00", "s2": "684600.00", "has_nonsiku": true}, {"contract_code": "CG-2025021", "contract_name": "磨煤机衬板采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-12-21", "c1": "943800.00", "e1": "188700.00", "b2": "174100.00", "s2": "173600.00", "has_nonsiku": true}, {"contract_code": "CG-2025022", "contract_name": "循环水泵采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-01-22", "c1": "981000.00", "e1": "264800.00", "b2": "245400.00", "s2": "246200.00", "has_nonsiku": true}, {"contract_code": "CG-2025023", "contract_name": "除盐水箱采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-02-23", "c1": "1018200.00", "e1": "346100.00", "b2": "324600.00", "s2": "325300.00", "has_nonsiku": true}, {"contract_code": "CG-2025024", "contract_name": "烟风道补偿器采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-03-24", "c1": "1055400.00", "e1": "432700.00", "b2": "410500.00", "s2": "411000.00", "has_nonsiku": true}, {"contract_code": "CG-2025025", "contract_name": "低压配电柜采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-04-25", "c1": "1092600.00", "e1": "524400.00", "b2": "503400.00", "s2": "503400.00", "has_nonsiku": true}, {"contract_code": "CG-2025026", "contract_name": "热工电缆采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-05-26", "c1": "1129800.00", "e1": "621300.00", "b2": "603200.00", "s2": "602600.00", "has_nonsiku": true}, {"contract_code": "CG-2025027", "contract_name": "除尘布袋采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-06-27", "c1": "1167000.00", "e1": "723500.00", "b2": "710400.00", "s2": "709000.00", "has_nonsiku": true}, {"contract_code": "CG-2025028", "contract_name": "钢结构支架采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-07-01", "c1": "1204200.00", "e1": "830800.00", "b2": "749900.00", "s2": "747700.00", "has_nonsiku": true}, {"contract_code": "CG-2025029", "contract_name": "化学加药装置采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-08-02", "c1": "1241400.00", "e1": "943400.00", "b2": "855800.00", "s2": "858400.00", "has_nonsiku": true}, {"contract_code": "CG-2025030", "contract_name": "暖通空调机组采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-09-03", "c1": "1278500.00", "e1": "1061100.00", "b2": "974200.00", "s2": "976200.00", "has_nonsiku": true}, {"contract_code": "CG-2025031", "contract_name": "磨煤机衬板采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-10-04", "c1": "1315700.00", "e1": "263100.00", "b2": "244300.00", "s2": "244600.00", "has_nonsiku": true}, {"contract_code": "CG-2025032", "contract_name": "循环水泵采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-11-05", "c1": "1352900.00", "e1": "365200.00", "b2": "343200.00", "s2": "343200.00", "has_nonsiku": true}, {"contract_code": "CG-2025033", "contract_name": "除盐水箱采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-12-06", "c1": "1390100.00", "e1": "472600.00", "b2": "449300.00", "s2": "448900.00", "has_nonsiku": true}, {"contract_code": "CG-2025034", "contract_name": "烟风道补偿器采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-01-07", "c1": "1427300.00", "e1": "585100.00", "b2": "562700.00", "s2": "561600.00", "has_nonsiku": true}, {"contract_code": "CG-2025035", "contract_name": "低压配电柜采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-02-08", "c1": "1464500.00", "e1": "702900.00", "b2": "683800.00", "s2": "681800.00", "has_nonsiku": true}, {"contract_code": "CG-2025036", "contract_name": "热工电缆采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-03-09", "c1": "1501700.00", "e1": "825900.00", "b2": "806800.00", "s2": "809300.00", "has_nonsiku": true}, {"contract_code": "CG-2025037", "contract_name": "除尘布袋采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-04-10", "c1": "1538900.00", "e1": "954100.00", "b2": "856800.00", "s2": "858600.00", "has_nonsiku": true}, {"contract_code": "CG-2025038", "contract_name": "钢结构支架采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-05-11", "c1": "1576100.00", "e1": "1087500.00", "b2": "988600.00", "s2": "989600.00", "has_nonsiku": true}, {"contract_code": "CG-2025039", "contract_name": "化学加药装置采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-06-12", "c1": "1613300.00", "e1": "1226100.00", "b2": "1128000.00", "s2": "1128000.00", "has_nonsiku": true}, {"contract_code": "CG-2025040", "contract_name": "暖通空调机组采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-07-13", "c1": "1650500.00", "e1": "1369900.00", "b2": "1275200.00", "s2": "1274000.00", "has_nonsiku": true}, {"contract_code": "CG-2025041", "contract_name": "磨煤机衬板采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-08-14", "c1": "1687700.00", "e1": "337500.00", "b2": "317800.00", "s2": "317200.00", "has_nonsiku": true}, {"contract_code": "CG-2025042", "contract_name": "循环水泵采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-09-15", "c1": "1724900.00", "e1": "465700.00", "b2": "443700.00", "s2": "442400.00", "has_nonsiku": true}, {"contract_code": "CG-2025043", "contract_name": "除盐水箱采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-10-16", "c1": "1762100.00", "e1": "599100.00", "b2": "573300.00", "s2": "575100.00", "has_nonsiku": true}, {"contract_code": "CG-2025044", "contract_name": "烟风道补偿器采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-11-17", "c1": "1799200.00", "e1": "737600.00", "b2": "713900.00", "s2": "715400.00", "has_nonsiku": true}, {"contract_code": "CG-2025045", "contract_name": "低压配电柜采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-12-18", "c1": "1836400.00", "e1": "881400.00", "b2": "862800.00", "s2": "863700.00", "has_nonsiku": true}, {"contract_code": "CG-2025046", "contract_name": "热工电缆采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-01-19", "c1": "1873600.00", "e1": "1030400.00", "b2": "927300.00", "s2": "927300.00", "has_nonsiku": true}, {"contract_code": "CG-2025047", "contract_name": "除尘布袋采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-02-20", "c1": "1910800.00", "e1": "1184600.00", "b2": "1078900.00", "s2": "1077900.00", "has_nonsiku": true}, {"contract_code": "CG-2025048", "contract_name": "钢结构支架采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-03-21", "c1": "1948000.00", "e1": "1344100.00", "b2": "1238900.00", "s2": "1236500.00", "has_nonsiku": true}, {"contract_code": "CG-2025049", "contract_name": "化学加药装置采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-04-22", "c1": "1985200.00", "e1": "1508700.00", "b2": "1407200.00", "s2": "1403000.00", "has_nonsiku": true}, {"contract_code": "CG-2025050", "contract_name": "暖通空调机组采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-05-23", "c1": "2022400.00", "e1": "1678500.00", "b2": "1572900.00", "s2": "1577700.00", "has_nonsiku": true}, {"contract_code": "CG-2025051", "contract_name": "磨煤机衬板采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-06-24", "c1": "2059600.00", "e1": "411900.00", "b2": "390500.00", "s2": "391300.00", "has_nonsiku": true}, {"contract_code": "CG-2025052", "contract_name": "循环水泵采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-07-25", "c1": "2096800.00", "e1": "566100.00", "b2": "542800.00", "s2": "543400.00", "has_nonsiku": true}, {"contract_code": "CG-2025053", "contract_name": "除盐水箱采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-08-26", "c1": "2134000.00", "e1": "725500.00", "b2": "703700.00", "s2": "703700.00", "has_nonsiku": true}, {"contract_code": "CG-2025054", "contract_name": "烟风道补偿器采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-09-27", "c1": "2171200.00", "e1": "890100.00", "b2": "873000.00", "s2": "872200.00", "has_nonsiku": true}, {"contract_code": "CG-2025055", "contract_name": "低压配电柜采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-10-01", "c1": "2208400.00", "e1": "1060000.00", "b2": "955900.00", "s2": "954000.00", "has_nonsiku": true}, {"contract_code": "CG-2025056", "contract_name": "热工电缆采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-11-02", "c1": "2245600.00", "e1": "1235000.00", "b2": "1127100.00", "s2": "1123800.00", "has_nonsiku": true}, {"contract_code": "CG-2025057", "contract_name": "除尘布袋采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-12-03", "c1": "2282800.00", "e1": "1415300.00", "b2": "1298000.00", "s2": "1302000.00", "has_nonsiku": true}, {"contract_code": "CG-2025058", "contract_name": "钢结构支架采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-01-04", "c1": "2320000.00", "e1": "1600800.00", "b2": "1485700.00", "s2": "1488700.00", "has_nonsiku": true}, {"contract_code": "CG-2025059", "contract_name": "化学加药装置采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-02-05", "c1": "2357100.00", "e1": "1791300.00", "b2": "1682100.00", "s2": "1683800.00", "has_nonsiku": true}, {"contract_code": "CG-2025060", "contract_name": "暖通空调机组采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-03-06", "c1": "2394300.00", "e1": "1987200.00", "b2": "1887800.00", "s2": "1887800.00", "has_nonsiku": true}, {"contract_code": "CG-202601", "contract_name": "汽轮机辅机采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-01-01", "c1": "5000000.00", "e1": "3200000.00", "b2": "3100000.00", "s2": "3050000.00", "has_nonsiku": true}, {"contract_code": "CG-202602", "contract_name": "除尘滤袋年度采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-02-02", "c1": "800000.00", "e1": "800000.00", "b2": "800000.00", "s2": "800000.00", "has_nonsiku": true}, {"contract_code": "CG-202603", "contract_name": "自控仪表备件采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-03-03", "c1": "300000.00", "e1": "301000.00", "b2": "300500.00", "s2": "300600.00", "has_nonsiku": true}, {"contract_code": "CG-202604", "contract_name": "起重机械采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-04-04", "c1": "3600000.00", "e1": "3612000.00", "b2": "3600000.00", "s2": "3600000.00", "has_nonsiku": true}, {"contract_code": "CG-202605", "contract_name": "泵组设备采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-05-05", "c1": "2000000.00", "e1": "600000.00", "b2": "500000.00", "s2": "500000.00", "has_nonsiku": true}, {"contract_code": "CG-202606", "contract_name": "主机岛成套设备采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-06-06", "c1": "100000000.00", "e1": "100000000.00", "b2": "80000000.00", "s2": "83000000.00", "has_nonsiku": true}, {"contract_code": "CG-202607", "contract_name": "环保岛改造工程合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N04", "billing_type": "N02", "sign_date": "2025-07-07", "c1": "5000000.00", "e1": "5500000.00", "b2": "5500000.00", "s2": "5500000.00", "has_nonsiku": true}, {"contract_code": "CG-202608", "contract_name": "脱硫系统设备采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-08-08", "c1": "1200000.00", "e1": "2400000.00", "b2": "2400000.00", "s2": "2400000.00", "has_nonsiku": true}, {"contract_code": "CG-202609", "contract_name": "输煤系统安装工程合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N04", "billing_type": "N02", "sign_date": "2025-09-09", "c1": "1600000.00", "e1": "2000000.00", "b2": "1950000.00", "s2": "1900000.00", "has_nonsiku": true}, {"contract_code": "CG-202610", "contract_name": "电气成套设备采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-10-10", "c1": "2500000.00", "e1": "2650000.00", "b2": "2600000.00", "s2": "2600000.00", "has_nonsiku": true}, {"contract_code": "CG-202611", "contract_name": "给水泵组采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-11-11", "c1": "6000000.00", "e1": "3000000.00", "b2": "3000000.00", "s2": "3500000.00", "has_nonsiku": true}, {"contract_code": "CG-202612", "contract_name": "除灰系统设备采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-12-12", "c1": "5000000.00", "e1": "3000000.00", "b2": "4800000.00", "s2": "4000000.00", "has_nonsiku": true}, {"contract_code": "CG-202613", "contract_name": "现场技术服务合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N03", "billing_type": "N02", "sign_date": "2025-01-13", "c1": "500000.00", "e1": "450000.00", "b2": "0.00", "s2": "450000.00", "has_nonsiku": true}, {"contract_code": "CG-202614", "contract_name": "烟道防腐材料采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "杭州环保工程科技有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-02-14", "c1": "700000.00", "e1": "620000.00", "b2": "620000.00", "s2": "500000.00", "has_nonsiku": true}, {"contract_code": "CG-202615", "contract_name": "空冷岛设备采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "武汉电力安装工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-03-15", "c1": "2400000.00", "e1": "1500000.00", "b2": "1200000.00", "s2": "1600000.00", "has_nonsiku": true}, {"contract_code": "CG-202616", "contract_name": "锅炉本体部件采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "成都起重机械有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-04-16", "c1": "9600000.00", "e1": "5000000.00", "b2": "5300000.00", "s2": "4800000.00", "has_nonsiku": true}, {"contract_code": "CG-202617", "contract_name": "化学水处理设备采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-05-17", "c1": "2000000.00", "e1": "1000000.00", "b2": "1000000.00", "s2": "1080000.00", "has_nonsiku": true}, {"contract_code": "CG-202618", "contract_name": "保温材料采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-06-18", "c1": "1000000.00", "e1": "500000.00", "b2": "200000.00", "s2": "208000.00", "has_nonsiku": true}, {"contract_code": "CG-202619", "contract_name": "电缆桥架采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-07-19", "c1": "2000000.00", "e1": "2000000.00", "b2": "2000000.00", "s2": "2012000.00", "has_nonsiku": true}, {"contract_code": "CG-202620", "contract_name": "热控仪表成套采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "上海自控仪表工程有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-08-20", "c1": "2000000.00", "e1": "1000000.00", "b2": "2000000.00", "s2": "2100000.00", "has_nonsiku": true}, {"contract_code": "CG-202621", "contract_name": "除尘器本体采购合同", "member_code": "911100001000100033", "member_name": "华衡工程建设有限公司", "vendor_name": "沈阳泵业集团销售有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-09-21", "c1": "2000000.00", "e1": "1000000.00", "b2": "2000000.00", "s2": "2110000.00", "has_nonsiku": true}, {"contract_code": "CG-202625", "contract_name": "输灰管道采购合同", "member_code": "911100001000100044", "member_name": "华衡物资贸易有限公司", "vendor_name": "南京汽轮机辅机有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-01-25", "c1": "1500000.00", "e1": "800000.00", "b2": null, "s2": null, "has_nonsiku": false}, {"contract_code": "CG-202627", "contract_name": "磨煤机备件采购合同", "member_code": "911100001000100011", "member_name": "华衡重工股份有限公司", "vendor_name": "青岛重工机电设备有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-02-26", "c1": "6000000.00", "e1": "6000000.00", "b2": "6200000.00", "s2": "5000000.00", "has_nonsiku": true}, {"contract_code": "CG-202628", "contract_name": "送风机设备采购合同", "member_code": "911100001000100022", "member_name": "华衡能源装备有限公司", "vendor_name": "石家庄除尘设备制造有限公司", "contract_type": "N01", "billing_type": "N02", "sign_date": "2025-03-27", "c1": "2000000.00", "e1": "2200000.00", "b2": "1800000.00", "s2": "2000000.00", "has_nonsiku": true}], "evidence": [["CLUE-20260630-0001", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202613", "合同唯一编码，聚合主键"], ["CLUE-20260630-0001", 2, "司库第16张 合同", "CONTRACT_NAME", "现场技术服务合同", "合同名称"], ["CLUE-20260630-0001", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "500000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0001", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "450000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0001", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0001", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0001", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0001", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0001", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202613", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0001", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "0.00", "R1 一侧 B2"], ["CLUE-20260630-0001", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "450000.00", "R1 另一侧 S2"], ["CLUE-20260630-0001", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0001", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0001", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0002", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202615", "合同唯一编码，聚合主键"], ["CLUE-20260630-0002", 2, "司库第16张 合同", "CONTRACT_NAME", "空冷岛设备采购合同", "合同名称"], ["CLUE-20260630-0002", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "2400000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0002", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "1500000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0002", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0002", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0002", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0002", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0002", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202615", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0002", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "1200000.00", "R1 一侧 B2"], ["CLUE-20260630-0002", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "1600000.00", "R1 另一侧 S2"], ["CLUE-20260630-0002", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0002", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0002", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0003", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202627", "合同唯一编码，聚合主键"], ["CLUE-20260630-0003", 2, "司库第16张 合同", "CONTRACT_NAME", "磨煤机备件采购合同", "合同名称"], ["CLUE-20260630-0003", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "6000000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0003", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "6000000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0003", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0003", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0003", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0003", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0003", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202627", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0003", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "6200000.00", "R1 一侧 B2"], ["CLUE-20260630-0003", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "5000000.00", "R1 另一侧 S2"], ["CLUE-20260630-0003", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0003", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-05-10 09:41:18", "多版本取最新依据"], ["CLUE-20260630-0003", 14, "非司库第11张 发票及支付信息表", "状态", "2", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0004", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202614", "合同唯一编码，聚合主键"], ["CLUE-20260630-0004", 2, "司库第16张 合同", "CONTRACT_NAME", "烟道防腐材料采购合同", "合同名称"], ["CLUE-20260630-0004", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "700000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0004", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "620000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0004", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0004", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0004", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0004", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0004", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202614", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0004", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "620000.00", "R1 一侧 B2"], ["CLUE-20260630-0004", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "500000.00", "R1 另一侧 S2"], ["CLUE-20260630-0004", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0004", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0004", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0005", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202612", "合同唯一编码，聚合主键"], ["CLUE-20260630-0005", 2, "司库第16张 合同", "CONTRACT_NAME", "除灰系统设备采购合同", "合同名称"], ["CLUE-20260630-0005", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "5000000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0005", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "3000000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0005", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0005", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0005", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0005", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0005", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202612", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0005", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "4800000.00", "R1 一侧 B2"], ["CLUE-20260630-0005", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "4000000.00", "R1 另一侧 S2"], ["CLUE-20260630-0005", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0005", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0005", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0006", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202611", "合同唯一编码，聚合主键"], ["CLUE-20260630-0006", 2, "司库第16张 合同", "CONTRACT_NAME", "给水泵组采购合同", "合同名称"], ["CLUE-20260630-0006", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "6000000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0006", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "3000000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0006", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0006", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0006", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0006", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0006", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202611", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0006", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "3000000.00", "R1 一侧 B2"], ["CLUE-20260630-0006", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "3500000.00", "R1 另一侧 S2"], ["CLUE-20260630-0006", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0006", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0006", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0007", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202628", "合同唯一编码，聚合主键"], ["CLUE-20260630-0007", 2, "司库第16张 合同", "CONTRACT_NAME", "送风机设备采购合同", "合同名称"], ["CLUE-20260630-0007", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "2000000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0007", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "2200000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0007", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0007", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0007", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0007", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0007", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202628", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0007", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "1800000.00", "R1 一侧 B2"], ["CLUE-20260630-0007", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "2000000.00", "R1 另一侧 S2"], ["CLUE-20260630-0007", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0007", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0007", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0008", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202616", "合同唯一编码，聚合主键"], ["CLUE-20260630-0008", 2, "司库第16张 合同", "CONTRACT_NAME", "锅炉本体部件采购合同", "合同名称"], ["CLUE-20260630-0008", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "9600000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0008", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "5000000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0008", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0008", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0008", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0008", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0008", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202616", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0008", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "5300000.00", "R1 一侧 B2"], ["CLUE-20260630-0008", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "4800000.00", "R1 另一侧 S2"], ["CLUE-20260630-0008", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0008", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0008", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0009", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202617", "合同唯一编码，聚合主键"], ["CLUE-20260630-0009", 2, "司库第16张 合同", "CONTRACT_NAME", "化学水处理设备采购合同", "合同名称"], ["CLUE-20260630-0009", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "2000000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0009", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "1000000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0009", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0009", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0009", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0009", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0009", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202617", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0009", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "1000000.00", "R1 一侧 B2"], ["CLUE-20260630-0009", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "1080000.00", "R1 另一侧 S2"], ["CLUE-20260630-0009", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0009", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0009", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0010", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202621", "合同唯一编码，聚合主键"], ["CLUE-20260630-0010", 2, "司库第16张 合同", "CONTRACT_NAME", "除尘器本体采购合同", "合同名称"], ["CLUE-20260630-0010", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "2000000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0010", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "1000000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0010", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0010", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0010", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0010", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0010", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202621", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0010", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "2000000.00", "R1 一侧 B2"], ["CLUE-20260630-0010", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "2110000.00", "R1 另一侧 S2"], ["CLUE-20260630-0010", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0010", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0010", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0011", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202608", "合同唯一编码，聚合主键"], ["CLUE-20260630-0011", 2, "司库第16张 合同", "CONTRACT_NAME", "脱硫系统设备采购合同", "合同名称"], ["CLUE-20260630-0011", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "1200000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0011", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "2400000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0011", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0011", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0011", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0011", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0011", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202608", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0011", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "2400000.00", "R1 一侧 B2"], ["CLUE-20260630-0011", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "2400000.00", "R1 另一侧 S2"], ["CLUE-20260630-0011", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0011", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0011", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0012", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202609", "合同唯一编码，聚合主键"], ["CLUE-20260630-0012", 2, "司库第16张 合同", "CONTRACT_NAME", "输煤系统安装工程合同", "合同名称"], ["CLUE-20260630-0012", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "1600000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0012", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "2000000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0012", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0012", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0012", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0012", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0012", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202609", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0012", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "1950000.00", "R1 一侧 B2"], ["CLUE-20260630-0012", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "1900000.00", "R1 另一侧 S2"], ["CLUE-20260630-0012", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0012", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0012", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0013", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202607", "合同唯一编码，聚合主键"], ["CLUE-20260630-0013", 2, "司库第16张 合同", "CONTRACT_NAME", "环保岛改造工程合同", "合同名称"], ["CLUE-20260630-0013", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "5000000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0013", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "5500000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0013", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0013", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0013", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0013", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0013", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202607", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0013", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "5500000.00", "R1 一侧 B2"], ["CLUE-20260630-0013", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "5500000.00", "R1 另一侧 S2"], ["CLUE-20260630-0013", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0013", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0013", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0014", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202628", "合同唯一编码，聚合主键"], ["CLUE-20260630-0014", 2, "司库第16张 合同", "CONTRACT_NAME", "送风机设备采购合同", "合同名称"], ["CLUE-20260630-0014", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "2000000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0014", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "2200000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0014", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0014", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0014", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0014", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0014", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202628", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0014", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "1800000.00", "R1 一侧 B2"], ["CLUE-20260630-0014", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "2000000.00", "R1 另一侧 S2"], ["CLUE-20260630-0014", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0014", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0014", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"], ["CLUE-20260630-0015", 1, "司库第16张 合同", "CONTRACT_CODE", "CG-202610", "合同唯一编码，聚合主键"], ["CLUE-20260630-0015", 2, "司库第16张 合同", "CONTRACT_NAME", "电气成套设备采购合同", "合同名称"], ["CLUE-20260630-0015", 3, "司库第16张 合同", "CONTRACT_AMOUNT", "2500000.00", "合同总金额，R4 分母"], ["CLUE-20260630-0015", 4, "司库第16张 合同", "SETTLEMENT_AMOUNT", "2650000.00", "已结算金额，R4 分子"], ["CLUE-20260630-0015", 5, "司库第16张 合同", "FRAMEWORK_CONTRACT", "T00", "框架标记，T00 参与判定"], ["CLUE-20260630-0015", 6, "司库第16张 合同", "CURRENCTCODE", "CNY", "币种"], ["CLUE-20260630-0015", 7, "司库第16张 合同", "BILLING_TYPE", "N02", "结算类型，N02 为付款"], ["CLUE-20260630-0015", 8, "司库第16张 合同", "DAYIDX", "2026-06-30", "数据日期"], ["CLUE-20260630-0015", 9, "非司库第11张 发票及支付信息表", "合同编号", "CG-202610", "与 CONTRACT_CODE 对齐"], ["CLUE-20260630-0015", 10, "非司库第11张 发票及支付信息表", "累计发票金额", "2600000.00", "R1 一侧 B2"], ["CLUE-20260630-0015", 11, "非司库第11张 发票及支付信息表", "累计支付金额", "2600000.00", "R1 另一侧 S2"], ["CLUE-20260630-0015", 12, "非司库第11张 发票及支付信息表", "数据日期", "2026-06-30", "快照日"], ["CLUE-20260630-0015", 13, "非司库第11张 发票及支付信息表", "更新时间", "2026-06-30 18:00:00", "多版本取最新依据"], ["CLUE-20260630-0015", 14, "非司库第11张 发票及支付信息表", "状态", "1", "1 新增 / 2 修改 / 3 删除"]], "dq": [{"contract_code": "CG-202625", "contract_name": "输灰管道采购合同", "level": "数据质量", "code": "DQ1", "reason": "司库合同表有该合同，非司库发票及支付信息表无对应记录，R1 无法判定"}, {"contract_code": "CG-2026-ORPHAN", "contract_name": "历史搬迁项目尾款（合同表未登记）", "level": "数据质量", "code": "DQ2", "reason": "非司库有该合同编号，司库合同表无对应合同，无法参与任一规则判定"}, {"contract_code": "KJ-2026-001", "contract_name": "", "level": "范围排除", "code": "EX1", "reason": "16 合同表：框架合同（FRAMEWORK_CONTRACT≠T00）"}, {"contract_code": "CG-202623", "contract_name": "", "level": "范围排除", "code": "EX1", "reason": "16 合同表：币种为 USD，非 CNY"}, {"contract_code": "KJ-2026-002", "contract_name": "", "level": "范围排除", "code": "EX1", "reason": "16 合同表：框架合同（FRAMEWORK_CONTRACT≠T00）"}, {"contract_code": "CG-202601", "contract_name": "", "level": "数据质量", "code": "DQ3", "reason": "11 发票及支付表：被更新版本覆盖（2026-03-31 23:59:59）"}, {"contract_code": "CG-202627", "contract_name": "", "level": "数据质量", "code": "DQ3", "reason": "11 发票及支付表：被更新版本覆盖（2026-03-15 10:02:33）"}, {"contract_code": "CG-202627", "contract_name": "", "level": "数据质量", "code": "DQ3", "reason": "11 发票及支付表：状态=3 删除记录（更新时间 2026-06-28 16:03:45）"}], "design": [{"no": "D01", "code": "CG-202601", "intent": "正常履约：票款差 5 万，占 1.61%", "expect": "不命中"}, {"no": "D02", "code": "CG-202602", "intent": "完全对齐：票、款、结算三者相等", "expect": "不命中"}, {"no": "D03", "code": "CG-202603", "intent": "尾差：票款差 100 元、结算超 1000 元", "expect": "不命中"}, {"no": "D04", "code": "CG-202604", "intent": "结算超 1.2 万但仅占 0.33%，只过绝对门槛", "expect": "不命中"}, {"no": "D05", "code": "CG-202605", "intent": "未结算完：已结算 60 万 / 合同 200 万", "expect": "不命中"}, {"no": "D06", "code": "CG-202606", "intent": "大合同：票款差 300 万但只占 3.61%", "expect": "不命中"}, {"no": "D07", "code": "CG-202607", "intent": "已结算超合同额 10%", "expect": "R4 命中"}, {"no": "D08", "code": "CG-202608", "intent": "已结算恰为合同额 2 倍（100%）", "expect": "R4 命中"}, {"no": "D09", "code": "CG-202609", "intent": "已结算超合同额 25%", "expect": "R4 命中"}, {"no": "D10", "code": "CG-202610", "intent": "已结算超合同额 6%，刚过低档", "expect": "R4 命中"}, {"no": "D11", "code": "CG-202611", "intent": "付款大于开票 14.29%", "expect": "R1 命中"}, {"no": "D12", "code": "CG-202612", "intent": "开票大于付款 16.67%（先票后款形态）", "expect": "R1 命中"}, {"no": "D13", "code": "CG-202613", "intent": "已付款 45 万、无任何发票（差额率 100%）", "expect": "R1 命中"}, {"no": "D14", "code": "CG-202614", "intent": "开票大于付款 19.35%", "expect": "R1 命中"}, {"no": "D15", "code": "CG-202615", "intent": "付款大于开票 25%", "expect": "R1 命中"}, {"no": "D16", "code": "CG-202616", "intent": "开票大于付款 9.43%，落低档", "expect": "R1 命中"}, {"no": "D17", "code": "CG-202617", "intent": "付款大于开票 7.41%，落低档", "expect": "R1 命中"}, {"no": "D18", "code": "CG-202618", "intent": "票款差 8,000 元，未过绝对门槛", "expect": "不命中"}, {"no": "D19", "code": "CG-202619", "intent": "票款差 1.2 万但仅占 0.6%，只过绝对门槛", "expect": "不命中"}, {"no": "D20", "code": "CG-202620", "intent": "票款差 10 万但占 4.76%，刚好卡在 5% 以下", "expect": "不命中"}, {"no": "D21", "code": "CG-202621", "intent": "票款差 11 万占 5.21%，刚好过线", "expect": "R1 命中"}, {"no": "D22", "code": "KJ-2026-001", "intent": "框架合同（FRAMEWORK_CONTRACT=T01）", "expect": "排除"}, {"no": "D23", "code": "CG-202623", "intent": "外币合同（CURRENCTCODE=USD）", "expect": "排除"}, {"no": "D24", "code": "KJ-2026-002", "intent": "框架合同，合同额为 0", "expect": "排除"}, {"no": "D25", "code": "CG-202625", "intent": "司库有合同、非司库无报送记录", "expect": "数据质量"}, {"no": "D26", "code": "CG-2026-ORPHAN", "intent": "非司库有记录、司库合同表无对应合同", "expect": "数据质量"}, {"no": "D27", "code": "CG-202627", "intent": "同一合同 3 条报送记录，须取最新有效版本", "expect": "R1 命中"}, {"no": "D28", "code": "CG-202628", "intent": "同一合同同时触发 R1 与 R4", "expect": "双命中"}], "dict": [["16 合同", "COMCODE", "所属集团编码", "文本(18)", "必填", "集团统一社会信用代码，用于归属"], ["16 合同", "COMNAME", "所属集团名称", "文本(100)", "必填", "集团名称"], ["16 合同", "ACNTMCODE", "本方单位编码", "文本(18)", "必填", "合同承办单位代码，输出「成员单位」来源"], ["16 合同", "ACNTMNAME", "本方单位名称", "文本(128)", "必填", "合同承办单位名称"], ["16 合同", "OPPOSITE_COMPNAY", "对方单位名称", "文本(512)", "必填", "合同对方全称"], ["16 合同", "OPPOSITE_COMPNAYCODE", "对方单位税号", "文本(18)", "必填", "对方统一社会信用代码"], ["16 合同", "CONTRACT_CODE", "合同编号", "文本(128)", "必填", "聚合主键 k，与 11 表合同编号对齐"], ["16 合同", "CONTRACT_NAME", "合同名称", "文本(512)", "必填", "线索展示用"], ["16 合同", "CONTRACT_TYPE", "合同类型", "文本(3)", "必填", "N01 采购 / N02 销售 / N03 服务 / N04 工程等"], ["16 合同", "CONTRACT_SUBJECT", "合同标的物", "文本(512)", "必填", "标的物名称"], ["16 合同", "BILLING_TYPE", "结算类型", "文本(3)", "必填", "N01 收款 / N02 付款 / N03 无收无支"], ["16 合同", "SIGN_DATE", "签订日期", "日期(10)", "必填", "多版本取最新的依据"], ["16 合同", "START_DATE", "起始日期", "日期(10)", "必填", "合同生效起算日"], ["16 合同", "END_DATE", "终止日期", "日期(10)", "必填", "无限期填 9999-12-31"], ["16 合同", "FRAMEWORK_CONTRACT", "是否框架合同", "文本(3)", "必填", "T00 非框架 / T01 框架；本项目仅取 T00"], ["16 合同", "CONTRACT_AMOUNT", "合同总金额", "数值(18,2)", "必填", "R4 分母 C1；规范注明「非框架合同填写」"], ["16 合同", "SETTLEMENT_AMOUNT", "已结算金额", "数值(18,2)", "必填", "R4 分子 E1；规范注明「非框架合同填写」"], ["16 合同", "CURRENCTCODE", "币种", "文本(3)", "必填", "GB/T 12406 三位代码；本项目仅取 CNY"], ["16 合同", "DAYIDX", "数据日期", "日期(10)", "必填", "快照日对齐依据"], ["11 发票及支付", "所属集团统一社会信用代码", "所属集团统一社会信用代码", "文本(18)", "必填", "集团归属"], ["11 发票及支付", "所属集团名称", "所属集团名称", "文本", "必填", "集团名称"], ["11 发票及支付", "更新时间", "更新时间", "时间", "必填", "同合同多版本取最新的依据"], ["11 发票及支付", "状态", "状态", "文本", "必填", "1 新增 / 2 修改 / 3 删除；剔除 3"], ["11 发票及支付", "合同编号", "合同编号", "文本", "必填", "聚合主键 k，与 CONTRACT_CODE 对齐"], ["11 发票及支付", "合同名称", "合同名称", "文本", "非必填", "线索展示用"], ["11 发票及支付", "累计发票金额", "累计发票金额", "数值（元）", "必填", "R1 一侧 B2，须为剔除红冲后的净额"], ["11 发票及支付", "累计支付金额", "累计支付金额", "数值（元）", "必填", "R1 另一侧 S2"], ["11 发票及支付", "采购人名称", "采购人名称", "文本", "非必填", "采购企业名称，说明该表为采购口径"], ["11 发票及支付", "采购人代码", "采购人代码", "文本(18)", "必填", "采购企业统一社会信用代码"], ["11 发票及支付", "数据日期", "数据日期", "文本", "必填", "快照日对齐依据"]]};
+const {params:P0, summary:S, clues:CL, features:FT, evidence:EV, dq:DQ, design:DG, dict:DC} = P;
+const BASE = {amt:Number(P0.tolerance_amount), rat:Number(P0.tolerance_ratio)};
+
+const fmt = n => Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const wan = n => (Number(n)/10000).toLocaleString('zh-CN',{maximumFractionDigits:1})+' 万';
+const pct = (r,d=2) => (Number(r)*100).toFixed(d)+'%';
+const lvCls = l => ({'高':'t-high','中':'t-mid','低':'t-low'}[l]||'t-mute');
+
+function compute(amt, rat){
+  const out=[];
+  FT.forEach(f=>{
+    const c1=Number(f.c1), e1=Number(f.e1);
+    const over=e1-c1;
+    if(c1>0 && over>amt && over/c1>rat){
+      const score=Math.min(100,Math.round((over/c1)/0.25*1000)/10);
+      out.push({rule:'R4',code:f.contract_code,ratio:over/c1,diff:over,score,
+        level:score>=80?'高':score>=40?'中':'低'});
+    }
+    if(f.b2!==null && f.b2!==undefined && f.s2!==null && f.s2!==undefined){
+      const b2=Number(f.b2), s2=Number(f.s2), d=Math.abs(b2-s2), base=Math.max(b2,s2);
+      if(base>0 && d>amt && d/base>rat){
+        const score=Math.min(100,Math.round((d/base)/0.25*1000)/10);
+        out.push({rule:'R1',code:f.contract_code,ratio:d/base,diff:d,score,
+          level:score>=80?'高':score>=40?'中':'低'});
+      }
+    }
+  });
+  return out;
+}
+
+const RES0 = compute(BASE.amt, BASE.rat);
+let CUR = RES0;
+let pick = CL.length? CL[0].线索ID : null;
+let filter = 'ALL';
+
+/* ---------- 概览 ---------- */
+document.getElementById('badges').innerHTML = [
+  ['模型编码',P0.model_code],['版本',P0.model_version],['快照日',P0.snapshot_date],
+  ['观察期',P0.observation_start+' ~ '+P0.observation_end],
+  ['容差',fmt(BASE.amt)+' 元 + '+pct(BASE.rat,0)]
+].map(([k,v])=>`<span class="badge">${k} <b>${v}</b></span>`).join('');
+
+document.getElementById('ov-note').textContent =
+  `${S.contract_judged} 份合同参与判定 · ${S.invoice_versions} 条报送记录去重后 ${S.invoice_latest} 份 · 证据项 ${S.evidence_total} 条`;
+
+const settleAll = FT.reduce((a,f)=>a+Number(f.e1),0);
+const c1All = FT.reduce((a,f)=>a+Number(f.c1),0);
+document.getElementById('kpis').innerHTML = [
+  ['参与判定合同', S.contract_judged, '份', '合同额合计 '+wan(c1All)+' 元'],
+  ['命中线索', S.clue_total, '条', `R1 ${S.r1_total} · R4 ${S.r4_total}`],
+  ['高风险', S.lv_high, '条', `中 ${S.lv_mid} · 低 ${S.lv_low}`],
+  ['命中率', S.hit_rate, '%', '线索数 ÷ 参与判定合同数'],
+  ['数据质量与排除', S.dq_total, '条', '不进线索表，可逐条追溯']
+].map(([k,v,u,n])=>`<div class="kpi"><div class="k">${k}</div>
+  <div class="v">${v}<small>${u}</small></div><div class="n">${n}</div></div>`).join('');
+
+/* ---------- 链路图 ---------- */
+document.getElementById('flow').innerHTML = `
+<svg viewBox="0 0 680 168" width="100%" role="img" aria-label="两条规则的数据链路">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6"
+    orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9aa8bd"
+    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+  <rect x="24" y="26" width="196" height="48" rx="8" fill="#fff" stroke="#dce3ed" stroke-width="1"/>
+  <text x="122" y="46" font-size="12.5" font-weight="600" fill="#1c3557" text-anchor="middle">16 合同表</text>
+  <text x="122" y="63" font-size="11" fill="#7a869a" text-anchor="middle">合同额 C1 · 已结算 E1</text>
+  <rect x="24" y="98" width="196" height="48" rx="8" fill="#fff" stroke="#dce3ed" stroke-width="1"/>
+  <text x="122" y="118" font-size="12.5" font-weight="600" fill="#1c3557" text-anchor="middle">11 发票及支付信息表</text>
+  <text x="122" y="135" font-size="11" fill="#7a869a" text-anchor="middle">累计发票 B2 · 累计支付 S2</text>
+
+  <path d="M220 50 L330 50" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M220 122 L330 122" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
+
+  <rect x="336" y="26" width="150" height="48" rx="8" fill="#f4f1fd" stroke="#cec6f2" stroke-width="1"/>
+  <text x="411" y="46" font-size="12.5" font-weight="600" fill="#534ab7" text-anchor="middle">R4</text>
+  <text x="411" y="63" font-size="11" fill="#6b61a8" text-anchor="middle">已结算 − 合同额</text>
+  <rect x="336" y="98" width="150" height="48" rx="8" fill="#e8f1fb" stroke="#c3daf3" stroke-width="1"/>
+  <text x="411" y="118" font-size="12.5" font-weight="600" fill="#185fa5" text-anchor="middle">R1</text>
+  <text x="411" y="135" font-size="11" fill="#3d7ab8" text-anchor="middle">|发票 − 支付|</text>
+
+  <path d="M486 50 L590 50" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
+  <path d="M486 122 L590 122" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
+  <rect x="596" y="26" width="60" height="48" rx="8" fill="#fbfcfe" stroke="#dce3ed" stroke-width="1"/>
+  <text x="626" y="46" font-size="12" font-weight="600" fill="#1c3557" text-anchor="middle">线索</text>
+  <text x="626" y="63" font-size="10.5" fill="#7a869a" text-anchor="middle">一条一行</text>
+  <rect x="596" y="98" width="60" height="48" rx="8" fill="#fbfcfe" stroke="#dce3ed" stroke-width="1"/>
+  <text x="626" y="118" font-size="12" font-weight="600" fill="#1c3557" text-anchor="middle">线索</text>
+  <text x="626" y="135" font-size="10.5" fill="#7a869a" text-anchor="middle">一条一行</text>
+  <text x="24" y="158" font-size="11" fill="#7a869a">两张表在特征层已按合同编号对齐；规则计算阶段零 join，下游按合同编号并排展示</text>
+</svg>`;
+
+/* ---------- 线索表 ---------- */
+const NAV = [['s1','运行概览'],['s2','线索清单'],['s3','线索详情'],['s4','阈值实验室'],['s5','样本设计'],['s6','字段字典']];
+document.getElementById('nav').innerHTML = NAV.map(([id,t],i)=>
+  `<button data-t="${id}" class="${i===0?'on':''}">${t}</button>`).join('');
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
+  document.getElementById(b.dataset.t).scrollIntoView({behavior:'smooth',block:'start'});
+});
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting) document.querySelectorAll('#nav button')
+      .forEach(b=>b.classList.toggle('on', b.dataset.t===e.target.id));
+  }),{rootMargin:'-60px 0px -70% 0px'});
+  NAV.forEach(([id])=>obs.observe(document.getElementById(id)));
+}
+
+function clueRows(){
+  return CL.filter(c=>filter==='ALL'||c.规则编号===filter);
+}
+function renderTabs(){
+  const n = k => CL.filter(c=>k==='ALL'||c.规则编号===k).length;
+  document.getElementById('tabs').innerHTML = [['ALL','全部'],['R1','R1 票款背离'],['R4','R4 累计结算超合同额']]
+    .map(([k,t])=>`<button data-k="${k}" class="${filter===k?'on':''}">${t} · ${n(k)}</button>`).join('');
+  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{filter=b.dataset.k;renderTabs();renderTable();});
+}
+function renderTable(){
+  const rows = clueRows();
+  document.getElementById('clue-table').innerHTML = `
+    <thead><tr><th>线索ID</th><th>规则</th><th>合同编号</th><th>成员单位</th>
+      <th class="num">合同额</th><th class="num">已结算 / 累计发票</th><th class="num">累计支付</th>
+      <th class="num">差异额</th><th class="num">差异率</th><th class="num">评分</th><th>等级</th></tr></thead>
+    <tbody>${rows.map(c=>`<tr data-id="${c.线索ID}" class="${c.线索ID===pick?'sel':''}">
+      <td class="mono" style="font-size:11px" title="${c.线索ID}">…${c.线索ID.slice(-4)}</td>
+      <td><span class="tag ${c.规则编号==='R1'?'t-r1':'t-r4'}">${c.规则编号}</span></td>
+      <td class="mono">${c.合同编号}</td>
+      <td>${c.成员单位}</td>
+      <td class="num">${fmt(c.合同金额C1)}</td>
+      <td class="num">${c.规则编号==='R4'?fmt(c.已结算金额E1):fmt(c.累计发票金额B2)}</td>
+      <td class="num">${c.规则编号==='R4'?'—':fmt(c.累计支付金额S2)}</td>
+      <td class="num" style="color:var(--high)">${fmt(c.差异金额)}</td>
+      <td class="num">${c.差异率}</td>
+      <td class="num"><b>${c.风险评分}</b></td>
+      <td><span class="tag ${lvCls(c.风险等级)}">${c.风险等级}</span></td>
+    </tr>`).join('')}</tbody>`;
+  document.querySelectorAll('#clue-table tbody tr').forEach(tr=>tr.onclick=()=>{
+    pick=tr.dataset.id; renderTable(); renderDetail();
+    document.getElementById('s3').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  document.getElementById('table-note').textContent =
+    `共 ${rows.length} 条；按「规则编号 + 合同编号」唯一，同一合同可同时触发两条规则`;
+}
+
+/* ---------- 详情 ---------- */
+function renderDetail(){
+  const c = CL.find(x=>x.线索ID===pick);
+  if(!c){document.getElementById('detail').innerHTML='<div class="card empty">暂无线索</div>';return;}
+  document.getElementById('det-id').textContent = c.线索ID + ' · ' + c.规则名称;
+  const ev = EV.filter(e=>e[0]===c.线索ID);
+  const isR4 = c.规则编号==='R4';
+  const rows = isR4
+    ? [['合同额 C1',Number(c.合同金额C1),Number(c.合同金额C1)],
+       ['已结算 E1',Number(c.已结算金额E1),Number(c.已结算金额E1)]]
+    : [['累计发票 B2',Number(c.累计发票金额B2),Math.max(Number(c.累计发票金额B2),Number(c.累计支付金额S2))],
+       ['累计支付 S2',Number(c.累计支付金额S2),Math.max(Number(c.累计发票金额B2),Number(c.累计支付金额S2))]];
+  const maxV = Math.max(...rows.map(r=>r[1]),1);
+
+  const members = FT.filter(f=>f.contract_code===c.合同编号);
+  const grp = {};
+  ev.forEach(e=>{(grp[e[2]] = grp[e[2]]||[]).push(e);});
+
+  document.getElementById('detail').innerHTML = `
+  <div class="grid3">
+    <div class="card pad">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <b style="font-size:14px;color:var(--navy)">${c.合同编号}</b>
+        <span class="tag ${lvCls(c.风险等级)}">${c.风险等级} · ${c.风险评分} 分</span>
+      </div>
+      <dl class="dl">
+        <dt>合同名称</dt><dd>${c.合同名称}</dd>
+        <dt>成员单位</dt><dd>${c.成员单位}</dd>
+        <dt>命中规则</dt><dd><span class="tag ${isR4?'t-r4':'t-r1'}">${c.规则编号} ${c.规则名称}</span></dd>
+        <dt>差异方向</dt><dd>${c.规则名称==='票款背离'?(Number(c.累计支付金额S2)>Number(c.累计发票金额B2)?'付款大于开票':'开票大于付款'):'已结算超合同额'}</dd>
+        <dt>差异额</dt><dd class="mono" style="color:var(--high);font-size:14px">${fmt(c.差异金额)} 元</dd>
+        <dt>差异率</dt><dd class="mono">${c.差异率}</dd>
+        <dt>快照日</dt><dd class="mono">${c.快照日}</dd>
+      </dl>
+      <div style="margin-top:14px">
+        <div style="font-size:11.5px;color:var(--ink-3);margin-bottom:6px">${isR4?'已结算 vs 合同额':'累计发票 vs 累计支付'}</div>
+        <div class="cmp">${rows.map(([n,v,b])=>`<div class="row">
+          <span style="color:var(--ink-3)">${n}</span>
+          <span class="bar"><i class="${isR4&&n.startsWith('已结算')?'warn':''}" style="width:${(v/maxV*100).toFixed(1)}%"></i></span>
+          <span class="num">${fmt(v)}</span></div>`).join('')}</div>
+      </div>
+    </div>
+
+    <div class="card pad">
+      <b style="font-size:13px;color:var(--navy)">风险理由</b>
+      <div class="reason" style="margin-top:8px">${c.风险理由}</div>
+      <b style="font-size:13px;color:var(--navy);display:block;margin-top:14px">排查建议</b>
+      <div style="font-size:12.5px;color:var(--ink-2);margin-top:6px;line-height:1.75">${c.排查建议}</div>
+      <div class="note" style="margin-top:14px">
+        评分 = 差异率 ÷ 25% × 100（封顶 100），等级按评分切分（≥80 高 / ≥40 中 / 其余低）。
+        评分只用于排序，不构成风险定性。
+      </div>
+    </div>
+
+    <div class="card pad">
+      <b style="font-size:13px;color:var(--navy)">证据项</b>
+      <div style="font-size:11.5px;color:var(--ink-3);margin:4px 0 8px">共 ${ev.length} 项，按来源表分组</div>
+      <div class="scroll" style="max-height:300px">
+        <table><thead><tr><th>来源表 / 字段</th><th class="num">取值</th></tr></thead><tbody>
+        ${Object.entries(grp).map(([tbl,list])=>`
+          <tr><td colspan="2" style="background:#fbfcfe;font-size:11px;color:var(--ink-3)">${tbl}</td></tr>
+          ${list.map(e=>`<tr><td class="mono" style="font-size:11.5px">${e[3]}</td>
+            <td class="num">${e[4]}</td></tr>`).join('')}`).join('')}
+        </tbody></table>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- 阈值实验室 ---------- */
+function renderLab(){
+  const amt = Number(document.getElementById('s-amt').value);
+  const rat = Number(document.getElementById('s-rat').value)/100;
+  document.getElementById('o-amt').textContent = fmt(amt)+' 元';
+  document.getElementById('o-rat').textContent = pct(rat,1);
+  const now = compute(amt, rat);
+  const key = x => x.rule+':'+x.code;
+  const before = new Set(RES0.map(key)), after = new Set(now.map(key));
+  const add = now.filter(x=>!before.has(key(x)));
+  const del = RES0.filter(x=>!after.has(key(x)));
+  const lv = {'高':0,'中':0,'低':0}; now.forEach(x=>lv[x.level]++);
+
+  document.getElementById('delta').innerHTML = `
+    <span>当前命中 <b>${now.length}</b> 条</span>
+    <span>高 <b>${lv['高']}</b> · 中 <b>${lv['中']}</b> · 低 <b>${lv['低']}</b></span>
+    <span class="plus">新增 <b>+${add.length}</b></span>
+    <span class="minus">消失 <b>−${del.length}</b></span>`;
+
+  const head = `<thead><tr><th>变化</th><th>规则</th><th>合同编号</th>
+    <th class="num">差异额</th><th class="num">差异率</th><th class="num">评分</th><th>等级</th></tr></thead>`;
+  const body = [...add.map(x=>['新增',x]),...del.map(x=>['消失',x])]
+    .map(([t,x])=>`<tr><td><span class="tag ${t==='新增'?'t-high':'t-mute'}">${t}</span></td>
+      <td><span class="tag ${x.rule==='R1'?'t-r1':'t-r4'}">${x.rule}</span></td>
+      <td class="mono">${x.code}</td><td class="num">${fmt(x.diff)}</td>
+      <td class="num">${pct(x.ratio)}</td><td class="num">${x.score}</td>
+      <td><span class="tag ${lvCls(x.level)}">${x.level}</span></td></tr>`).join('');
+  document.getElementById('lab-table').innerHTML = add.length+del.length
+    ? `<table>${head}<tbody>${body}</tbody></table>`
+    : `<div style="font-size:12px;color:var(--ink-3);padding:8px 0">与基线（${fmt(BASE.amt)} 元 + ${pct(BASE.rat,0)}）一致，无新增或消失线索。</div>`;
+}
+['s-amt','s-rat'].forEach(id=>document.getElementById(id).oninput=renderLab);
+
+/* ---------- 样本设计 ---------- */
+document.getElementById('design-table').innerHTML = `
+  <thead><tr><th>编号</th><th>合同编号</th><th>设计意图</th><th>期望</th><th>实测</th><th class="num">评分</th></tr></thead>
+  <tbody>${DG.map(d=>{
+    const hit = CL.filter(c=>c.合同编号===d.code);
+    let actual, score='—';
+    if(d.expect==='排除'||d.expect==='数据质量') actual = DQ.some(x=>x.contract_code===d.code)?d.expect:'未触发';
+    else if(hit.length===0) actual='未命中';
+    else {actual = hit.map(h=>`${h.规则编号} ${h.风险等级}`).join(' + '); score=hit.map(h=>h.风险评分).join(' / ');}
+    const ok = d.expect==='排除'||d.expect==='数据质量' ? actual===d.expect
+             : (d.expect==='不命中' ? actual==='未命中' : hit.length>0);
+    return `<tr><td class="mono">${d.no}</td><td class="mono">${d.code}</td><td>${d.intent}</td>
+      <td>${d.expect}</td>
+      <td><span class="tag ${ok?'t-ok':'t-high'}">${actual}</span></td>
+      <td class="num">${score}</td></tr>`;
+  }).join('')}</tbody>`;
+
+/* ---------- 字段字典 ---------- */
+document.getElementById('dict-table').innerHTML = `
+  <thead><tr><th>来源表</th><th>字段名</th><th>中文名</th><th>类型</th><th>必填性</th><th>业务说明</th></tr></thead>
+  <tbody>${DC.map(d=>`<tr><td style="font-size:11.5px;color:var(--ink-3)">${d[0]}</td>
+    <td class="mono" style="font-size:11.5px">${d[1]}</td><td>${d[2]}</td>
+    <td class="mono" style="font-size:11.5px">${d[3]}</td><td>${d[4]}</td>
+    <td style="color:var(--ink-2)">${d[5]}</td></tr>`).join('')}</tbody>`;
+
+renderTabs(); renderTable(); renderDetail(); renderLab();
+</script>
+</body>
+</html>
