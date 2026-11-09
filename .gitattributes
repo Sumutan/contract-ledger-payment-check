@@ -1,0 +1,5 @@
+# CSV 保留 CRLF，避免 Windows 端 Excel 打开时行分隔异常
+*.csv -text
+*.docx binary
+*.pdf binary
+*.db binary
