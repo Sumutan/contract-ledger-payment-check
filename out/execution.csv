@@ -1,0 +1,2 @@
+﻿execution_id,model_code,model_version,contract_version,model_config_version,observation_start,observation_end,started_at,finished_at,execution_status,candidate_count,engine_version,triggered_by,request_key,runtime_snapshot_ref,result_manifest_ref,replay_of_execution_id,ext
+EXEC2026063001,CONTRACT_LEDGER_PAYMENT_CHECK,1.0.0,2.0,MC-002,2026-01-01T00:00:00+08:00,2026-07-01T00:00:00+08:00,2026-06-30T18:00:00+08:00,2026-06-30T18:00:00+08:00,SUCCESS,15,python-stdlib-3,用户 / 定时调度,REQ-20260630-01,out/runtime_snapshot.json,out/manifest.json,,

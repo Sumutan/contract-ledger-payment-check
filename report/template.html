@@ -101,7 +101,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
 <header>
   <div class="eyebrow">穿透式监管 · 模型任务报告</div>
   <h1>合同台账与票款执行一致性校验模型</h1>
-  <div class="sub">R1 票款背离 ｜ R4 累计结算超合同额 · 两条规则各读一张表，互不 join，可分别开发与验收</div>
+  <div class="sub">R1 票款背离 ｜ R2 累计结算超合同额 · 两条规则各读一张表，互不 join，可分别开发与验收</div>
   <div class="badges" id="badges"></div>
 </header>
 </div>
@@ -178,7 +178,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-si
 
 <script>
 const P = __PAYLOAD__;
-const {params:P0, summary:S, clues:CL, features:FT, evidence:EV, dq:DQ, design:DG, dict:DC} = P;
+const {params:P0, summary:S, clues:CL, features:FT, evidence:EV, dq:DQ, design:DG, dict:DC, v21:V21} = P;
 const BASE = {amt:Number(P0.tolerance_amount), rat:Number(P0.tolerance_ratio)};
 
 const fmt = n => Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -193,7 +193,7 @@ function compute(amt, rat){
     const over=e1-c1;
     if(c1>0 && over>amt && over/c1>rat){
       const score=Math.min(100,Math.round((over/c1)/0.25*1000)/10);
-      out.push({rule:'R4',code:f.contract_code,ratio:over/c1,diff:over,score,
+      out.push({rule:'R2',code:f.contract_code,ratio:over/c1,diff:over,score,
         level:score>=80?'高':score>=40?'中':'低'});
     }
     if(f.b2!==null && f.b2!==undefined && f.s2!==null && f.s2!==undefined){
@@ -221,13 +221,13 @@ document.getElementById('badges').innerHTML = [
 ].map(([k,v])=>`<span class="badge">${k} <b>${v}</b></span>`).join('');
 
 document.getElementById('ov-note').textContent =
-  `${S.contract_judged} 份合同参与判定 · ${S.invoice_versions} 条报送记录去重后 ${S.invoice_latest} 份 · 证据项 ${S.evidence_total} 条`;
+  `${S.contract_judged} 份合同参与判定 · ${S.invoice_versions} 条报送记录去重后 ${S.invoice_latest} 份 · 证据集 ${V21._set.length} 组 / 明细 ${V21._detail.length} 行`;
 
 const settleAll = FT.reduce((a,f)=>a+Number(f.e1),0);
 const c1All = FT.reduce((a,f)=>a+Number(f.c1),0);
 document.getElementById('kpis').innerHTML = [
   ['参与判定合同', S.contract_judged, '份', '合同额合计 '+wan(c1All)+' 元'],
-  ['命中线索', S.clue_total, '条', `R1 ${S.r1_total} · R4 ${S.r4_total}`],
+  ['命中线索', S.clue_total, '条', `R1 ${S.r1_total} · R2 ${S.r4_total}`],
   ['高风险', S.lv_high, '条', `中 ${S.lv_mid} · 低 ${S.lv_low}`],
   ['命中率', S.hit_rate, '%', '线索数 ÷ 参与判定合同数'],
   ['数据质量与排除', S.dq_total, '条', '不进线索表，可逐条追溯']
@@ -251,7 +251,7 @@ document.getElementById('flow').innerHTML = `
   <path d="M220 122 L330 122" fill="none" stroke="#9aa8bd" stroke-width="1.4" marker-end="url(#ar)"/>
 
   <rect x="336" y="26" width="150" height="48" rx="8" fill="#f4f1fd" stroke="#cec6f2" stroke-width="1"/>
-  <text x="411" y="46" font-size="12.5" font-weight="600" fill="#534ab7" text-anchor="middle">R4</text>
+  <text x="411" y="46" font-size="12.5" font-weight="600" fill="#534ab7" text-anchor="middle">R2</text>
   <text x="411" y="63" font-size="11" fill="#6b61a8" text-anchor="middle">已结算 − 合同额</text>
   <rect x="336" y="98" width="150" height="48" rx="8" fill="#e8f1fb" stroke="#c3daf3" stroke-width="1"/>
   <text x="411" y="118" font-size="12.5" font-weight="600" fill="#185fa5" text-anchor="middle">R1</text>
@@ -288,7 +288,7 @@ function clueRows(){
 }
 function renderTabs(){
   const n = k => CL.filter(c=>k==='ALL'||c.规则编号===k).length;
-  document.getElementById('tabs').innerHTML = [['ALL','全部'],['R1','R1 票款背离'],['R4','R4 累计结算超合同额']]
+  document.getElementById('tabs').innerHTML = [['ALL','全部'],['R1','R1 票款背离'],['R2','R2 累计结算超合同额']]
     .map(([k,t])=>`<button data-k="${k}" class="${filter===k?'on':''}">${t} · ${n(k)}</button>`).join('');
   document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{filter=b.dataset.k;renderTabs();renderTable();});
 }
@@ -299,13 +299,13 @@ function renderTable(){
       <th class="num">合同额</th><th class="num">已结算 / 累计发票</th><th class="num">累计支付</th>
       <th class="num">差异额</th><th class="num">差异率</th><th class="num">评分</th><th>等级</th></tr></thead>
     <tbody>${rows.map(c=>`<tr data-id="${c.线索ID}" class="${c.线索ID===pick?'sel':''}">
-      <td class="mono" style="font-size:11px" title="${c.线索ID}">…${c.线索ID.slice(-4)}</td>
+      <td class="mono" style="font-size:11px" title="${c.线索ID}">${c.候选ID}</td>
       <td><span class="tag ${c.规则编号==='R1'?'t-r1':'t-r4'}">${c.规则编号}</span></td>
       <td class="mono">${c.合同编号}</td>
       <td>${c.成员单位}</td>
       <td class="num">${fmt(c.合同金额C1)}</td>
-      <td class="num">${c.规则编号==='R4'?fmt(c.已结算金额E1):fmt(c.累计发票金额B2)}</td>
-      <td class="num">${c.规则编号==='R4'?'—':fmt(c.累计支付金额S2)}</td>
+      <td class="num">${c.规则编号==='R2'?fmt(c.已结算金额E1):fmt(c.累计发票金额B2)}</td>
+      <td class="num">${c.规则编号==='R2'?'—':fmt(c.累计支付金额S2)}</td>
       <td class="num" style="color:var(--high)">${fmt(c.差异金额)}</td>
       <td class="num">${c.差异率}</td>
       <td class="num"><b>${c.风险评分}</b></td>
@@ -324,18 +324,39 @@ function renderDetail(){
   const c = CL.find(x=>x.线索ID===pick);
   if(!c){document.getElementById('detail').innerHTML='<div class="card empty">暂无线索</div>';return;}
   document.getElementById('det-id').textContent = c.线索ID + ' · ' + c.规则名称;
-  const ev = EV.filter(e=>e[0]===c.线索ID);
-  const isR4 = c.规则编号==='R4';
-  const rows = isR4
-    ? [['合同额 C1',Number(c.合同金额C1),Number(c.合同金额C1)],
-       ['已结算 E1',Number(c.已结算金额E1),Number(c.已结算金额E1)]]
-    : [['累计发票 B2',Number(c.累计发票金额B2),Math.max(Number(c.累计发票金额B2),Number(c.累计支付金额S2))],
-       ['累计支付 S2',Number(c.累计支付金额S2),Math.max(Number(c.累计发票金额B2),Number(c.累计支付金额S2))]];
-  const maxV = Math.max(...rows.map(r=>r[1]),1);
+  const sets = (V21._set||[]).filter(s=>s.candidate_id===c.候选ID);
+  const dets = (V21._detail||[]).filter(d=>sets.some(s=>s.evidence_id===d[0]));
+  const DF = [['contract_id','合同编号'],['contract_name','合同名称'],['buyer_id','采购人代码'],
+              ['seller_id','对方税号'],['contract_amount','合同总金额'],['settle_amount','已结算金额'],
+              ['currency','币种'],['sign_date','签订日期'],['framework_flag','是否框架'],
+              ['invoice_amount','累计发票'],['payment_amount','累计支付'],['data_date','数据日期'],
+              ['record_status','状态'],['update_time','更新时间']];
+  const DIDX = {contract_id:4, contract_name:5, buyer_id:6, seller_id:7, contract_amount:8,
+                settle_amount:9, currency:10, sign_date:11, framework_flag:12,
+                invoice_amount:13, payment_amount:14, data_date:15, record_status:16, update_time:17};
+  function evBlock(){
+    if(!sets.length) return '<div style="font-size:12px;color:var(--ink-3)">无证据集</div>';
+    return sets.map(s=>{
+      const rows = dets.filter(d=>d[0]===s.evidence_id).map(d=>
+        DF.filter(([k])=>String(d[DIDX[k]]??'').trim()!=='').map(([k,lb])=>
+          `<tr><td style="color:var(--ink-3);width:88px">${lb}</td><td class="mono" style="text-align:right">${d[DIDX[k]]}</td></tr>`).join('')
+      ).join('<tr><td colspan="2" style="height:6px;border:0"></td></tr>');
+      return `<div style="margin-bottom:12px">
+        <div style="font-size:11.5px;color:var(--ink-2);margin-bottom:4px">
+          <span class="chip">${s.evidence_type}</span>
+          <span class="mono" style="font-size:10.5px;color:var(--ink-3)">${s.evidence_id}</span>
+          · ${s.record_count} 行</div>
+        <table style="font-size:11.5px"><tbody>${rows}</tbody></table></div>`;
+    }).join('');
+  }
 
-  const members = FT.filter(f=>f.contract_code===c.合同编号);
-  const grp = {};
-  ev.forEach(e=>{(grp[e[2]] = grp[e[2]]||[]).push(e);});
+  const isR2 = c.规则编号 === 'R2';
+  const rows = isR2
+    ? [['合同额 C1', Number(c.合同金额C1), Number(c.合同金额C1)],
+       ['已结算 E1', Number(c.已结算金额E1), Number(c.已结算金额E1)]]
+    : [['累计发票 B2', Number(c.累计发票金额B2), Math.max(Number(c.累计发票金额B2), Number(c.累计支付金额S2))],
+       ['累计支付 S2', Number(c.累计支付金额S2), Math.max(Number(c.累计发票金额B2), Number(c.累计支付金额S2))]];
+  const maxV = Math.max(...rows.map(r=>r[1]), 1);
 
   document.getElementById('detail').innerHTML = `
   <div class="grid3">
@@ -347,17 +368,17 @@ function renderDetail(){
       <dl class="dl">
         <dt>合同名称</dt><dd>${c.合同名称}</dd>
         <dt>成员单位</dt><dd>${c.成员单位}</dd>
-        <dt>命中规则</dt><dd><span class="tag ${isR4?'t-r4':'t-r1'}">${c.规则编号} ${c.规则名称}</span></dd>
+        <dt>命中规则</dt><dd><span class="tag ${isR2?'t-r4':'t-r1'}">${c.规则编号} ${c.规则名称}</span></dd>
         <dt>差异方向</dt><dd>${c.规则名称==='票款背离'?(Number(c.累计支付金额S2)>Number(c.累计发票金额B2)?'付款大于开票':'开票大于付款'):'已结算超合同额'}</dd>
         <dt>差异额</dt><dd class="mono" style="color:var(--high);font-size:14px">${fmt(c.差异金额)} 元</dd>
         <dt>差异率</dt><dd class="mono">${c.差异率}</dd>
         <dt>快照日</dt><dd class="mono">${c.快照日}</dd>
       </dl>
       <div style="margin-top:14px">
-        <div style="font-size:11.5px;color:var(--ink-3);margin-bottom:6px">${isR4?'已结算 vs 合同额':'累计发票 vs 累计支付'}</div>
+        <div style="font-size:11.5px;color:var(--ink-3);margin-bottom:6px">${isR2?'已结算 vs 合同额':'累计发票 vs 累计支付'}</div>
         <div class="cmp">${rows.map(([n,v,b])=>`<div class="row">
           <span style="color:var(--ink-3)">${n}</span>
-          <span class="bar"><i class="${isR4&&n.startsWith('已结算')?'warn':''}" style="width:${(v/maxV*100).toFixed(1)}%"></i></span>
+          <span class="bar"><i class="${isR2&&n.startsWith('已结算')?'warn':''}" style="width:${(v/maxV*100).toFixed(1)}%"></i></span>
           <span class="num">${fmt(v)}</span></div>`).join('')}</div>
       </div>
     </div>
@@ -374,16 +395,9 @@ function renderDetail(){
     </div>
 
     <div class="card pad">
-      <b style="font-size:13px;color:var(--navy)">证据项</b>
-      <div style="font-size:11.5px;color:var(--ink-3);margin:4px 0 8px">共 ${ev.length} 项，按来源表分组</div>
-      <div class="scroll" style="max-height:300px">
-        <table><thead><tr><th>来源表 / 字段</th><th class="num">取值</th></tr></thead><tbody>
-        ${Object.entries(grp).map(([tbl,list])=>`
-          <tr><td colspan="2" style="background:#fbfcfe;font-size:11px;color:var(--ink-3)">${tbl}</td></tr>
-          ${list.map(e=>`<tr><td class="mono" style="font-size:11.5px">${e[3]}</td>
-            <td class="num">${e[4]}</td></tr>`).join('')}`).join('')}
-        </tbody></table>
-      </div>
+      <b style="font-size:13px;color:var(--navy)">证据（V2.1 Evidence Set）</b>
+      <div style="font-size:11.5px;color:var(--ink-3);margin:4px 0 8px">${sets.length} 组证据集 · ${dets.length} 行明细</div>
+      <div class="scroll" style="max-height:320px">${evBlock()}</div>
     </div>
   </div>`;
 }

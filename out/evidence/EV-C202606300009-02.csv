@@ -1,0 +1,2 @@
+﻿evidence_id,detail_id,source_data_context_id,source_record_id,contract_id,contract_name,buyer_id,seller_id,contract_amount,settle_amount,currency,sign_date,framework_flag,invoice_amount,payment_amount,data_date,record_status,update_time,ext
+EV-C202606300009-02,D-001,DC-SIKU-16,CG-202617,CG-202617,化学水处理设备采购合同,911100001000100033,913201001000200011,2000000.00,1000000.00,CNY,2025-05-17,T00,,,2026-06-30,,,"{""schema_code"": ""CONTRACT_DETAIL""}"

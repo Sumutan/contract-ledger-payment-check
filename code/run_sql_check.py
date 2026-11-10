@@ -99,7 +99,7 @@ def main():
     # ---------- 线索集合比对 ----------
     sql_clue = {(r["rule_code"], r["contract_code"]): r for r in con.execute("SELECT * FROM v_rule_result")}
     py_clue = {}
-    with open(os.path.join(OUT, "clue_list.csv"), encoding="utf-8-sig") as f:
+    with open(os.path.join(OUT, "线索汇总_人读视图.csv"), encoding="utf-8-sig") as f:
         for r in csv.DictReader(f):
             py_clue[(r["规则编号"], r["合同编号"])] = r
 

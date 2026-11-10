@@ -1,0 +1,2 @@
+﻿evidence_id,detail_id,source_data_context_id,source_record_id,contract_id,contract_name,buyer_id,seller_id,contract_amount,settle_amount,currency,sign_date,framework_flag,invoice_amount,payment_amount,data_date,record_status,update_time,ext
+EV-C202606300008-02,D-001,DC-SIKU-16,CG-202616,CG-202616,锅炉本体部件采购合同,911100001000100022,915101001000200088,9600000.00,5000000.00,CNY,2025-04-16,T00,,,2026-06-30,,,"{""schema_code"": ""CONTRACT_DETAIL""}"

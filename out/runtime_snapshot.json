@@ -1,0 +1,11 @@
+{
+  "model_code": "CONTRACT_LEDGER_PAYMENT_CHECK",
+  "model_version": "1.0.0",
+  "snapshot_date": "2026-06-30",
+  "observation_start": "2026-01-01",
+  "observation_end": "2026-06-30",
+  "tolerance_amount": 10000.0,
+  "tolerance_ratio": 0.05,
+  "framework_filter": "T00",
+  "currency_filter": "CNY"
+}

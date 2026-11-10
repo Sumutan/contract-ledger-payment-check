@@ -1,0 +1,2 @@
+﻿evidence_id,detail_id,source_data_context_id,source_record_id,contract_id,contract_name,buyer_id,seller_id,contract_amount,settle_amount,currency,sign_date,framework_flag,invoice_amount,payment_amount,data_date,record_status,update_time,ext
+EV-C202606300002-02,D-001,DC-SIKU-16,CG-202615,CG-202615,空冷岛设备采购合同,911100001000100011,914201001000200077,2400000.00,1500000.00,CNY,2025-03-15,T00,,,2026-06-30,,,"{""schema_code"": ""CONTRACT_DETAIL""}"

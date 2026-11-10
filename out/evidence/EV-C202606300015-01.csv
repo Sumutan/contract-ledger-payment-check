@@ -1,0 +1,2 @@
+﻿evidence_id,detail_id,source_data_context_id,source_record_id,contract_id,contract_name,buyer_id,seller_id,contract_amount,settle_amount,currency,sign_date,framework_flag,invoice_amount,payment_amount,data_date,record_status,update_time,ext
+EV-C202606300015-01,D-001,DC-SIKU-16,CG-202610,CG-202610,电气成套设备采购合同,911100001000100044,913702001000200022,2500000.00,2650000.00,CNY,2025-10-10,T00,,,2026-06-30,,,"{""schema_code"": ""CONTRACT_DETAIL""}"

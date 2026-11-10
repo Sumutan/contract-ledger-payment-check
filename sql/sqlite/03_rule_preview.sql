@@ -4,10 +4,10 @@
 -- 参数：容差 绝对 10,000.00 元 且 相对 5%（两门槛同时满足）
 -- =============================================================================
 
-DROP TABLE IF EXISTS rs_r4;
-CREATE TABLE rs_r4 AS
+DROP TABLE IF EXISTS rs_r2;
+CREATE TABLE rs_r2 AS
 SELECT
-    'R4'                     AS rule_code,
+    'R2'                     AS rule_code,
     contract_code,
     c1                       AS contract_amount,
     e1                       AS settlement_amount,
@@ -39,6 +39,6 @@ WHERE b2 IS NOT NULL
 -- 合并视图，供导出与比对
 DROP VIEW IF EXISTS v_rule_result;
 CREATE VIEW v_rule_result AS
-SELECT rule_code, contract_code, diff_amount, diff_ratio, direction FROM rs_r4
+SELECT rule_code, contract_code, diff_amount, diff_ratio, direction FROM rs_r2
 UNION ALL
 SELECT rule_code, contract_code, diff_amount, diff_ratio, direction FROM rs_r1;

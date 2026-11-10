@@ -1,0 +1,2 @@
+﻿evidence_id,detail_id,source_data_context_id,source_record_id,contract_id,contract_name,buyer_id,seller_id,contract_amount,settle_amount,currency,sign_date,framework_flag,invoice_amount,payment_amount,data_date,record_status,update_time,ext
+EV-C202606300005-02,D-001,DC-SIKU-16,CG-202612,CG-202612,除灰系统设备采购合同,911100001000100022,913101001000200044,5000000.00,3000000.00,CNY,2025-12-12,T00,,,2026-06-30,,,"{""schema_code"": ""CONTRACT_DETAIL""}"

@@ -1,0 +1,2 @@
+﻿evidence_id,detail_id,source_data_context_id,source_record_id,contract_id,contract_name,buyer_id,seller_id,contract_amount,settle_amount,currency,sign_date,framework_flag,invoice_amount,payment_amount,data_date,record_status,update_time,ext
+EV-C202606300005-01,D-001,DC-NONS-11,CG-202612|2026-06-30 18:00:00,CG-202612,除灰系统设备采购合同,911100001000100022,,,,CNY,,,4800000.00,4000000.00,2026-06-30,1,2026-06-30 18:00:00,"{""schema_code"": ""INVOICE_PAY_SUMMARY_DETAIL""}"

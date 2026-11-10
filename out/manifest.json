@@ -1,0 +1,13 @@
+{
+  "execution_id": "EXEC2026063001",
+  "files": [
+    "candidate.csv",
+    "reason.csv",
+    "fact.csv",
+    "evidence_set.csv",
+    "evidence_detail.csv",
+    "explanation_evidence_rel.csv",
+    "execution.csv"
+  ],
+  "evidence_dir": "evidence/"
+}
