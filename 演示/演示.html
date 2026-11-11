@@ -34,6 +34,13 @@ h2{font-size:34px;line-height:1.3;font-weight:600;color:var(--navy);margin:0 0 8
 .lead{font-size:21px;line-height:1.7;color:var(--ink)}
 .body{font-size:17px;line-height:1.7;color:var(--muted)}
 .small{font-size:14px;color:var(--faint)}
+.en{display:block;font-family:var(--mono);font-size:10.5px;color:#a3b0c2;font-weight:400;letter-spacing:0}
+th{vertical-align:bottom}
+table.kv{width:100%;border-collapse:collapse;font-size:13px}
+table.kv td{padding:7px 9px;border-bottom:1px dashed #e9eef5}
+table.kv td.f{font-family:var(--mono);font-size:11.5px;color:#8a97a8;width:42%}
+table.kv td.cn{color:#5a6678;width:24%}
+table.kv td.v{text-align:right;font-family:var(--mono);color:#16202e}
 hr.rule{border:0;border-top:1px solid var(--line);margin:18px 0}
 
 pre{position:relative;background:#0f1a2b;color:#dbe6f5;border-radius:10px;margin:0;
@@ -139,7 +146,7 @@ ul.clean li b{color:var(--navy);font-weight:600}
   <div class="grid3 fill">
     <div class="card blue">
       <h3>① 数据</h3>
-      <p>两张表：司库 16 合同表、非司库 11 发票及支付信息表。87 份合同、90 条报送记录，其中 28 个是设计样本。</p>
+      <p>两张表：司库 16 合同表、非司库 11 发票及支付信息表。87 份合同（27 份设计 + 60 份背景）、90 条报送记录；设计样本共 28 个。</p>
       <div style="margin-top:14px" class="kpi">84<small>份参与判定</small></div>
     </div>
     <div class="card">
@@ -227,7 +234,7 @@ report/  报告模板与成品</pre>
 <section class="slide">
   <div class="tag"><b>数据</b> · 两张表，零 join</div>
   <h2>数据底座：只用报送侧两张表</h2>
-  <div class="sub">16 表喂 R2，11 表喂 R1；两条规则各读一张，互不关联。</div>
+  <div class="sub">16 表喂 R2，11 表喂 R1；两条规则各读一张，互不关联。<span style="color:#a3b0c2;font-size:15px">　C1 / E1 / B2 / S2 是量代号，中文含义见图</span></div>
   <div class="fill" style="display:flex;align-items:center">
     <svg viewBox="0 0 1152 300" width="100%" role="img" aria-label="两张表与两条规则">
       <defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6"
@@ -237,16 +244,20 @@ report/  报告模板与成品</pre>
         <rect x="10" y="40" width="330" height="112" rx="10" fill="#fff" stroke="#dce3ed"/>
         <rect x="10" y="40" width="5" height="112" rx="2.5" fill="#185fa5"/>
         <text x="34" y="74" font-size="18" font-weight="600" fill="#1c3557">司库第 16 张 · 合同表</text>
-        <text x="34" y="101" font-size="13.5" fill="#5a6678" font-family="monospace">CONTRACT_AMOUNT  C1</text>
-        <text x="34" y="123" font-size="13.5" fill="#5a6678" font-family="monospace">SETTLEMENT_AMOUNT  E1</text>
+        <text x="34" y="100" font-size="14.5" fill="#2c3e55">合同总金额</text>
+        <text x="120" y="100" font-size="12" fill="#8a97a8" font-family="monospace">C1 · CONTRACT_AMOUNT</text>
+        <text x="34" y="122" font-size="14.5" fill="#2c3e55">已结算金额</text>
+        <text x="120" y="122" font-size="12" fill="#8a97a8" font-family="monospace">E1 · SETTLEMENT_AMOUNT</text>
         <text x="34" y="143" font-size="13" fill="#8a97a8">框架过滤 T00 · 币种 CNY</text>
       </g>
       <g>
         <rect x="10" y="176" width="330" height="112" rx="10" fill="#fff" stroke="#dce3ed"/>
         <rect x="10" y="176" width="5" height="112" rx="2.5" fill="#0f6e56"/>
         <text x="34" y="210" font-size="18" font-weight="600" fill="#1c3557">非司库第 11 张 · 发票及支付</text>
-        <text x="34" y="237" font-size="13.5" fill="#5a6678" font-family="monospace">累计发票金额  B2</text>
-        <text x="34" y="259" font-size="13.5" fill="#5a6678" font-family="monospace">累计支付金额  S2</text>
+        <text x="34" y="236" font-size="14.5" fill="#2c3e55">累计发票金额</text>
+        <text x="134" y="236" font-size="12" fill="#8a97a8" font-family="monospace">B2</text>
+        <text x="34" y="258" font-size="14.5" fill="#2c3e55">累计支付金额</text>
+        <text x="134" y="258" font-size="12" fill="#8a97a8" font-family="monospace">S2</text>
         <text x="34" y="279" font-size="13" fill="#8a97a8">状态≠3 · 同合同取最新版本</text>
       </g>
       <path d="M346 96 L468 96" fill="none" stroke="#9aa8bd" stroke-width="1.8" marker-end="url(#ar2)"/>
@@ -300,6 +311,30 @@ report/  报告模板与成品</pre>
       </ul>
     </div>
   </div>
+  <hr class="rule" style="margin:14px 0 10px">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+    <div style="font-size:15px;color:var(--ink)">同一个合同 <b style="font-family:var(--mono)">CG-202608</b>，在两张表里各是什么样</div>
+    <div class="small">左：司库 16 表（英文数据标记）　右：非司库 11 表（中文业务名）</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px">
+    <table class="kv">
+      <tr><td class="f">CONTRACT_CODE</td><td class="cn">合同编号</td><td class="v">CG-202608</td></tr>
+      <tr><td class="f">CONTRACT_AMOUNT</td><td class="cn">合同总金额</td><td class="v">1,200,000.00</td></tr>
+      <tr><td class="f">SETTLEMENT_AMOUNT</td><td class="cn">已结算金额</td><td class="v">2,400,000.00</td></tr>
+      <tr><td class="f">FRAMEWORK_CONTRACT</td><td class="cn">是否框架合同</td><td class="v">T00</td></tr>
+      <tr><td class="f">CURRENCTCODE</td><td class="cn">币种</td><td class="v">CNY</td></tr>
+    </table>
+    <table class="kv">
+      <tr><td class="cn" style="width:46%">合同编号</td><td class="v">CG-202608</td></tr>
+      <tr><td class="cn">累计发票金额</td><td class="v">2,400,000.00</td></tr>
+      <tr><td class="cn">累计支付金额</td><td class="v">2,400,000.00</td></tr>
+      <tr><td class="cn">状态</td><td class="v">1（新增）</td></tr>
+      <tr><td class="cn">数据日期</td><td class="v">2026-06-30</td></tr>
+    </table>
+  </div>
+  <div style="margin-top:18px;padding:13px 18px;background:var(--blue-l);border:1px solid #c3daf3;border-radius:10px;font-size:14.5px;color:#2c3e55">
+    这两张表就是全部输入。<b>实际只用 10 个字段</b>（判定 6 个 + 过滤 4 个），不接入客户业务系统明细，也不需要发票明细。
+  </div>
   <div class="foot"><span>可复现：固定算法无随机数，同一环境每次生成完全一致</span><span>06 / 17</span></div>
 </section>
 
@@ -311,7 +346,7 @@ report/  报告模板与成品</pre>
     <div>
       <div class="body" style="margin-bottom:8px">16 合同表（19 字段，节选）</div>
       <table>
-        <thead><tr><th class="mono">CONTRACT_CODE</th><th class="mono">AMOUNT</th><th class="mono">SETTLEMENT</th><th class="mono">FW</th></tr></thead>
+        <thead><tr><th>合同编号<span class="en">CONTRACT_CODE</span></th><th>合同额<span class="en">CONTRACT_AMOUNT</span></th><th>已结算<span class="en">SETTLEMENT_AMOUNT</span></th><th>框架<span class="en">FRAMEWORK</span></th></tr></thead>
         <tbody>
           <tr><td class="mono">CG-202608</td><td class="num">1,200,000.00</td><td class="num">2,400,000.00</td><td class="mono">T00</td></tr>
           <tr><td class="mono">CG-202611</td><td class="num">6,000,000.00</td><td class="num">3,000,000.00</td><td class="mono">T00</td></tr>
@@ -323,7 +358,7 @@ report/  报告模板与成品</pre>
     <div>
       <div class="body" style="margin-bottom:8px">11 发票及支付信息表（11 字段，节选）</div>
       <table>
-        <thead><tr><th class="mono">合同编号</th><th class="mono">累计发票</th><th class="mono">累计支付</th><th class="mono">状态</th></tr></thead>
+        <thead><tr><th>合同编号<span class="en">合同编号</span></th><th>累计发票<span class="en">累计发票金额</span></th><th>累计支付<span class="en">累计支付金额</span></th><th>状态<span class="en">1新增 2修改 3删除</span></th></tr></thead>
         <tbody>
           <tr><td class="mono">CG-202611</td><td class="num">3,000,000.00</td><td class="num">3,500,000.00</td><td class="mono">2</td></tr>
           <tr><td class="mono">CG-202613</td><td class="num">0.00</td><td class="num">450,000.00</td><td class="mono">1</td></tr>
@@ -333,28 +368,45 @@ report/  报告模板与成品</pre>
       <div class="small" style="margin-top:8px">CG-202601 在表里有两条同编号记录，取「更新时间」最新的那条。</div>
     </div>
   </div>
+  <div class="grid3" style="margin-top:24px">
+    <div class="card">
+      <h3>框架合同</h3>
+      <p><b style="font-family:var(--mono)">KJ-2026-001</b><br>合同额与已结算都是 0。不过滤会让 R2 出现 0 分母，必须前置剔除。</p>
+    </div>
+    <div class="card">
+      <h3>多版本记录</h3>
+      <p><b style="font-family:var(--mono)">CG-202601</b><br>同一合同两条报送记录，一条状态 1、一条状态 2，按更新时间取最新。</p>
+    </div>
+    <div class="card">
+      <h3>外币合同</h3>
+      <p><b style="font-family:var(--mono)">CG-202623</b><br>币种 USD，本版不折算、直接排除，避免汇率差被当成票款差。</p>
+    </div>
+  </div>
   <div class="foot"><span>字段名照《司库报送标准规范 2.0》原文，未做任何改写</span><span>07 / 17</span></div>
 </section>
 
 <!-- 8 样本设计 -->
 <section class="slide">
   <div class="tag"><b>数据</b> · 样本设计</div>
-  <h2>28 个设计样本，其中 8 条是「不命中」对照</h2>
+  <h2>28 个设计样本，其中 9 条是「不命中」对照</h2>
   <div class="sub">只放命中样本说明不了模型准不准，对照样本才是。</div>
   <div class="grid3" style="margin-top:4px">
     <div class="card">
       <h3>门槛对照（4 条）</h3>
-      <p>CG-202606：票款差 300 万，但只占 3.61%，<b>不命中</b><br>
-         CG-202619：差 1.2 万，占 0.6%，<b>不命中</b><br>
-         CG-202621：差 11 万，占 5.21%，<b>命中</b></p>
+      <p><b>CG-202618</b>　差 8,000 元　未过绝对门槛<br>
+         <b>CG-202619</b>　占 0.6%　未过相对门槛<br>
+         <b>CG-202606</b>　占 3.61%　未过相对门槛<br>
+         <b>CG-202621</b>　占 5.21%　命中</p>
     </div>
     <div class="card">
-      <h3>清洗对照（2 条）</h3>
-      <p>CG-202627：同合同 3 条报送记录，其中一条状态=3、一条旧版本，<b>取最新有效版本</b>后判中风险</p>
+      <h3>多版本（1 条）</h3>
+      <p><b>CG-202627</b>　同一合同 3 条报送记录：状态 1、状态 2、状态 3。<br><br>
+         取最新有效版本后判中风险；若误取状态 3 的零值，会直接漏报。</p>
     </div>
     <div class="card">
-      <h3>排除与质量（5 条）</h3>
-      <p>框架合同 2 条、外币 1 条被排除；<br>有合同无报送 1 条、有报送无合同 1 条，落数据质量清单</p>
+      <h3>排除与数据质量（5 条）</h3>
+      <p>框架合同 2 条、外币合同 1 条 → 排除<br><br>
+         有合同无报送 1 条、有报送无合同 1 条 → 数据质量清单</p>
     </div>
   </div>
   <div class="card blue" style="margin-top:18px">
@@ -401,7 +453,7 @@ report/  报告模板与成品</pre>
     <div>
       <div class="card blue" style="margin-bottom:14px">
         <p style="font-family:var(--mono);font-size:15px;color:#185fa5;line-height:1.9">
-        D1 = |B2 − S2|<br>
+        D1 = |B2 − S2|<br><span style="font-family:-apple-system,sans-serif;font-size:12.5px;color:#5b8bbd">B2 累计发票金额　S2 累计支付金额</span><br>
         命中 = D1 &gt; 10,000 元 <b>且</b> D1 ÷ MAX(B2,S2) &gt; 5%<br>
         评分 = MIN(100, 差异率 ÷ 25% × 100)</p>
       </div>
@@ -436,7 +488,7 @@ report/  报告模板与成品</pre>
     <div>
       <div class="card" style="margin-bottom:14px;background:#f4f1fd;border-color:#cec6f2">
         <p style="font-family:var(--mono);font-size:15px;color:#534ab7;line-height:1.9">
-        D4 = E1 − C1（保留正负号）<br>
+        D4 = E1 − C1（保留正负号）<br><span style="font-family:-apple-system,sans-serif;font-size:12.5px;color:#6b61a8">E1 已结算金额　C1 合同总金额</span><br>
         命中 = D4 &gt; 10,000 元 <b>且</b> D4 ÷ C1 &gt; 5%<br>
         评分 = MIN(100, 超合同率 ÷ 25% × 100)</p>
       </div>
@@ -457,7 +509,7 @@ report/  报告模板与成品</pre>
     sc = score_of(ratio)
     <span class="k">return</span> dict(rule=<span class="s">"R2"</span>, diff=over, ratio=ratio,
                 score=sc, level=level_of(sc), ...)</pre>
-      <div class="small" style="margin-top:10px">完整实现见 <code class="inl">code/run_model.py</code> 第 190–215 行</div>
+      <div class="small" style="margin-top:10px">完整实现见 <code class="inl">code/run_model.py</code> 第 155–171 行</div>
     </div>
   </div>
   <div class="foot"><span>评分与等级由同一函数派生，不会出现「61 分却高风险」</span><span>11 / 17</span></div>
@@ -478,7 +530,7 @@ report/  报告模板与成品</pre>
 <span class="k">FROM</span> dwd_contract_clean c
 <span class="k">LEFT JOIN</span> dwd_invoice_latest i
   <span class="k">ON</span> c.CONTRACT_CODE = i.<span class="s">"合同编号"</span>;</pre>
-      <div class="small" style="margin-top:10px">清洗层先剔框架、剔外币、剔状态 3、取最新版本</div>
+      <div class="small" style="margin-top:10px">清洗层先剔框架、剔外币、剔状态 3、取最新版本<br>c1 / e1 / b2 / s2 是特征表列名，分别对应合同额、已结算、累计发票、累计支付</div>
     </div>
     <div>
       <pre style="font-size:13px"><span class="c">-- 03_rule_preview.sql：R1</span>
@@ -587,8 +639,8 @@ open report/任务报告.html</pre>
          <b>说明</b>：双门槛不是摆设。</p>
     </div>
     <div class="card">
-      <h3>③ 拖绝对门槛到 5 万</h3>
-      <p>低档线索成批消失，只剩大额差异。<br><br>
+      <h3>③ 拖绝对门槛到 20 万</h3>
+      <p>命中从 15 条降到 9 条，6 条低额线索消失。<br><br>
          <b>说明</b>：阈值影响的是排序与工作量，不是模型对错。</p>
     </div>
   </div>
