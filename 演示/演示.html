@@ -135,7 +135,7 @@ ul.clean li b{color:var(--navy);font-weight:600}
       <div>输出契约<b>V2.1 第四章</b></div>
     </div>
   </div>
-  <div class="foot"><span>R1 票款背离<span class="dot"></span>R2 累计结算超合同额</span><span>01 / 17</span></div>
+  <div class="foot"><span>R1 票款背离<span class="dot"></span>R2 累计结算超合同额</span><span class="pg"></span></div>
 </section>
 
 <!-- 2 总览 -->
@@ -160,7 +160,7 @@ ul.clean li b{color:var(--navy);font-weight:600}
       <div style="margin-top:14px" class="kpi">17.9%<small>命中率</small></div>
     </div>
   </div>
-  <div class="foot"><span>建议时长 15–20 分钟，其中现场跑代码约 6 分钟</span><span>02 / 17</span></div>
+  <div class="foot"><span>建议时长 15–20 分钟，其中现场跑代码约 6 分钟</span><span class="pg"></span></div>
 </section>
 
 <!-- 3 环境 -->
@@ -184,7 +184,7 @@ report/  报告模板与成品</pre>
       <p style="margin-top:12px">docs/ 与 out/ 可以不看：前者是文档生成脚本，后者是每次运行的产物。</p>
     </div>
   </div>
-  <div class="foot"><span>如果 Python 低于 3.9，请先升级；脚本用到海象运算符与 f-string 嵌套</span><span>03 / 17</span></div>
+  <div class="foot"><span>如果 Python 低于 3.9，请先升级；脚本用到海象运算符与 f-string 嵌套</span><span class="pg"></span></div>
 </section>
 
 <!-- 4 路线图 -->
@@ -227,7 +227,7 @@ report/  报告模板与成品</pre>
       <text x="8" y="190" font-size="13.5" fill="#8a97a8">每步 60–90 秒；STEP 2 与 STEP 3 之间是最值得停下来讲的规则口径</text>
     </svg>
   </div>
-  <div class="foot"><span>命令都在下一页逐条给出，可直接复制</span><span>04 / 17</span></div>
+  <div class="foot"><span>命令都在下一页逐条给出，可直接复制</span><span class="pg"></span></div>
 </section>
 
 <!-- 5 数据底座 -->
@@ -286,7 +286,7 @@ report/  报告模板与成品</pre>
       </g>
     </svg>
   </div>
-  <div class="foot"><span>没有 join，就没有跨表口径漂移——这是这一版最重要的设计取舍</span><span>05 / 17</span></div>
+  <div class="foot"><span>没有 join，就没有跨表口径漂移——这是这一版最重要的设计取舍</span><span class="pg"></span></div>
 </section>
 
 <!-- 6 命令1 -->
@@ -335,7 +335,7 @@ report/  报告模板与成品</pre>
   <div style="margin-top:18px;padding:13px 18px;background:var(--blue-l);border:1px solid #c3daf3;border-radius:10px;font-size:14.5px;color:#2c3e55">
     这两张表就是全部输入。<b>实际只用 10 个字段</b>（判定 6 个 + 过滤 4 个），不接入客户业务系统明细，也不需要发票明细。
   </div>
-  <div class="foot"><span>可复现：固定算法无随机数，同一环境每次生成完全一致</span><span>06 / 17</span></div>
+  <div class="foot"><span>可复现：固定算法无随机数，同一环境每次生成完全一致</span><span class="pg"></span></div>
 </section>
 
 <!-- 7 数据长什么样 -->
@@ -382,7 +382,7 @@ report/  报告模板与成品</pre>
       <p><b style="font-family:var(--mono)">CG-202623</b><br>币种 USD，本版不折算、直接排除，避免汇率差被当成票款差。</p>
     </div>
   </div>
-  <div class="foot"><span>字段名照《司库报送标准规范 2.0》原文，未做任何改写</span><span>07 / 17</span></div>
+  <div class="foot"><span>字段名照《司库报送标准规范 2.0》原文，未做任何改写</span><span class="pg"></span></div>
 </section>
 
 <!-- 8 样本设计 -->
@@ -412,7 +412,7 @@ report/  报告模板与成品</pre>
   <div class="card blue" style="margin-top:18px">
     <p style="color:#2c3e55;font-size:16px">现场可以说这句：<b>把相对门槛从 5% 拉到 0，CG-202606 立刻出现在「新增」列表里</b>——这就是双门槛的价值。</p>
   </div>
-  <div class="foot"><span>设计样本与实测结论逐条对照，报告第五节可直接翻</span><span>08 / 17</span></div>
+  <div class="foot"><span>设计样本与实测结论逐条对照，报告第五节可直接翻</span><span class="pg"></span></div>
 </section>
 
 <!-- 9 命令2 -->
@@ -442,7 +442,7 @@ report/  报告模板与成品</pre>
       <p style="margin-top:12px">6 项自检里有 1 项专门校验 V2.1 证据对象是否完整，不通过会直接终止，不产出半成品。</p>
     </div>
   </div>
-  <div class="foot"><span>零第三方依赖：csv / json / decimal / sqlite3 均为标准库</span><span>09 / 17</span></div>
+  <div class="foot"><span>零第三方依赖：csv / json / decimal / sqlite3 均为标准库</span><span class="pg"></span></div>
 </section>
 
 <!-- 10 R1 -->
@@ -477,7 +477,7 @@ report/  报告模板与成品</pre>
     ...</pre>
     </div>
   </div>
-  <div class="foot"><span>方向本身就是信息：款多查开票，票多查账期</span><span>10 / 17</span></div>
+  <div class="foot"><span>方向本身就是信息：款多查开票，票多查账期</span><span class="pg"></span></div>
 </section>
 
 <!-- 11 R2 -->
@@ -512,7 +512,7 @@ report/  报告模板与成品</pre>
       <div class="small" style="margin-top:10px">完整实现见 <code class="inl">code/run_model.py</code> 第 155–171 行</div>
     </div>
   </div>
-  <div class="foot"><span>评分与等级由同一函数派生，不会出现「61 分却高风险」</span><span>11 / 17</span></div>
+  <div class="foot"><span>评分与等级由同一函数派生，不会出现「61 分却高风险」</span><span class="pg"></span></div>
 </section>
 
 <!-- 12 SQL -->
@@ -545,7 +545,7 @@ report/  报告模板与成品</pre>
   <span class="k">AND</span> (e1 - c1) * 1.0 / c1 &gt; 0.05;</pre>
     </div>
   </div>
-  <div class="foot"><span>Hive 版用 GREATEST 取两值较大者，SQLite 版用 MAX；逻辑等价</span><span>12 / 17</span></div>
+  <div class="foot"><span>Hive 版用 GREATEST 取两值较大者，SQLite 版用 MAX；逻辑等价</span><span class="pg"></span></div>
 </section>
 
 <!-- 13 命令3 -->
@@ -569,7 +569,7 @@ report/  报告模板与成品</pre>
       <p style="margin-top:12px">这一步跑完，说明「换个引擎算，结果还是这 15 条」。</p>
     </div>
   </div>
-  <div class="foot"><span>SQLite 库文件落在 out/check.db，可自己打开查</span><span>13 / 17</span></div>
+  <div class="foot"><span>SQLite 库文件落在 out/check.db，可自己打开查</span><span class="pg"></span></div>
 </section>
 
 <!-- 14 命令4 -->
@@ -593,10 +593,131 @@ open report/任务报告.html</pre>
       </ul>
     </div>
   </div>
-  <div class="foot"><span>报告里的数字与 candidate.csv 同源，不会打架</span><span>14 / 17</span></div>
+  <div class="foot"><span>报告里的数字与 candidate.csv 同源，不会打架</span><span class="pg"></span></div>
 </section>
 
-<!-- 15 效果 -->
+
+<!-- 15 输出总表 -->
+<section class="slide">
+  <div class="tag"><b>输出</b> · out/输出总表.xlsx</div>
+  <h2>一个工作簿，四张子表</h2>
+  <div class="sub">列名与 V2.1 第四章逐项一致，不额外加列；打开就是表头加数据，可直接筛选、排序、透视。</div>
+  <div class="grid4" style="margin-top:8px">
+    <div class="card blue">
+      <h3>Risk Candidate</h3>
+      <div class="small" style="margin:-4px 0 10px">风险候选</div>
+      <div class="kpi" style="font-size:26px">15 <small>行 × 20 列</small></div>
+      <p style="margin-top:10px;font-size:13.5px">一条线索一行，是模型唯一的正式结果</p>
+    </div>
+    <div class="card">
+      <h3>Reason</h3>
+      <div class="small" style="margin:-4px 0 10px">原因</div>
+      <div class="kpi" style="font-size:26px">15 <small>行 × 9 列</small></div>
+      <p style="margin-top:10px;font-size:13.5px">按命中方向给出业务化解释，不暴露公式</p>
+    </div>
+    <div class="card">
+      <h3>Business Fact</h3>
+      <div class="small" style="margin:-4px 0 10px">业务事实</div>
+      <div class="kpi" style="font-size:26px">85 <small>行 × 18 列</small></div>
+      <p style="margin-top:10px;font-size:13.5px">金额、比率、快照日，拿到就能手工复算</p>
+    </div>
+    <div class="card">
+      <h3>Evidence Set</h3>
+      <div class="small" style="margin:-4px 0 10px">证据集</div>
+      <div class="kpi" style="font-size:26px">25 <small>行 × 9 列</small></div>
+      <p style="margin-top:10px;font-size:13.5px">指回源记录，明细另拆 25 份 CSV</p>
+    </div>
+  </div>
+  <div class="card amber" style="margin-top:18px">
+    <p style="color:#5c4a2a">首行冻结、已开自动筛选、横向打印并重复表头。<b>金额列两位小数、比例列十位小数</b>，数值以数值型存储，不是文本。</p>
+  </div>
+  <div style="display:flex;align-items:center;margin-top:16px;font-size:13px;color:var(--muted);flex-wrap:wrap">
+    <span style="color:var(--navy);font-weight:600;margin-right:12px">评审怎么读</span>
+    <span style="background:#eef2f8;border-radius:6px;padding:4px 10px;color:#42506a">① Candidate 定优先级</span>
+    <span style="margin:0 8px;color:#c3ccd9">→</span>
+    <span style="background:#eef2f8;border-radius:6px;padding:4px 10px;color:#42506a">② Reason 看原因</span>
+    <span style="margin:0 8px;color:#c3ccd9">→</span>
+    <span style="background:#eef2f8;border-radius:6px;padding:4px 10px;color:#42506a">③ Fact 手工复算</span>
+    <span style="margin:0 8px;color:#c3ccd9">→</span>
+    <span style="background:#eef2f8;border-radius:6px;padding:4px 10px;color:#42506a">④ Evidence 取证</span>
+  </div>
+  <div class="foot"><span>四张表的行数不同，通过 candidate_id 关联：一条线索对应 1 条 Reason、4–5 条 Fact、1–2 组证据</span><span class="pg"></span></div>
+</section>
+
+<!-- 16 字段怎么生成 -->
+<section class="slide">
+  <div class="tag"><b>输出</b> · 字段生成方法</div>
+  <h2>每个字段都是算出来的，没有一个是手填的</h2>
+  <div class="sub">同一个脚本 run_model.py 一次生成；改参数重跑，四张表整体重算，口径不会漂。</div>
+  <table style="margin-top:4px">
+    <thead><tr><th style="width:17%">子表</th><th style="width:33%">主要字段</th><th>怎么生成</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Risk Candidate</b></td>
+        <td class="mono" style="font-size:12.5px">candidate_id<br>execution_id<br>risk_type / risk_level<br>risk_score / risk_amount</td>
+        <td style="font-size:13.5px">规则命中后现场生成：ID = C + 快照日 + 4 位序号；
+          等级由评分切分（≥80 高 / ≥40 中 / 其余低）；risk_amount 取差异金额</td>
+      </tr>
+      <tr>
+        <td><b>Reason</b></td>
+        <td class="mono" style="font-size:12.5px">reason_code<br>reason_title<br>reason_description</td>
+        <td style="font-size:13.5px">按命中方向分支：款多 → INVOICE_LESS_THAN_PAYMENT；
+          票多 → INVOICE_MORE_THAN_PAYMENT；超额 → SETTLEMENT_OVER_CONTRACT</td>
+      </tr>
+      <tr>
+        <td><b>Business Fact</b></td>
+        <td class="mono" style="font-size:12.5px">fact_code<br>value_type + numeric_value<br>unit / comparison_type<br>benchmark_value</td>
+        <td style="font-size:13.5px">从特征表取 c1 / e1 / b2 / s2；金额 unit=CNY，比率存 0–1 且 unit=ratio；
+          门槛类事实带 GT 与阈值，评审可当场核对</td>
+      </tr>
+      <tr>
+        <td><b>Evidence Set</b></td>
+        <td class="mono" style="font-size:12.5px">evidence_id<br>evidence_type<br>detail_dataset_ref<br>record_count</td>
+        <td style="font-size:13.5px">按源表分组：11 表 → DOCUMENT_DETAIL，16 表 → CONTRACT_DETAIL；
+          每组明细拆到 out/evidence/EV-*.csv，ref 可直接解析</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="foot"><span>字段值全部来自 out/feature_table.csv 与源记录，不引入任何人工判断</span><span class="pg"></span></div>
+</section>
+
+<!-- 17 为什么要有这些字段 -->
+<section class="slide">
+  <div class="tag"><b>输出</b> · 字段设计依据</div>
+  <h2>为什么非要这些字段</h2>
+  <div class="sub">不是为了好看，是流程指导里明确要求：输出要能支撑排查与管理两类动作。</div>
+  <div class="grid3" style="margin-top:2px">
+    <div class="card blue">
+      <h3>共性字段 · 管模型</h3>
+      <p style="font-size:13px;line-height:1.75">线索 ID、模型编码、风险类型、风险分、风险等级</p>
+      <p style="margin-top:8px;font-size:13px;color:#2c3e55"><b>用途</b>：线索追踪与闭环管理、模型版本回溯、阈值调整后重算、人工复核优先级排序</p>
+    </div>
+    <div class="card teal">
+      <h3>溯源字段 · 找到人</h3>
+      <p style="font-size:13px;line-height:1.75">合同编号、成员单位名称与代码、数据来源</p>
+      <p style="margin-top:8px;font-size:13px;color:#1d5c4d"><b>用途</b>：风险定位与归属，知道该找哪家单位、哪份合同核对</p>
+    </div>
+    <div class="card amber">
+      <h3>个性字段 · 说清事</h3>
+      <p style="font-size:13px;line-height:1.75">金额、差异率、差异方向、证据集与明细</p>
+      <p style="margin-top:8px;font-size:13px;color:#5c4a2a"><b>用途</b>：可解释、可复算、可取证，复核时能直接定位原始记录</p>
+    </div>
+  </div>
+  <div style="margin-top:16px;padding:14px 18px;background:#f7f9fc;border-left:3px solid var(--navy);border-radius:0 8px 8px 0">
+    <div style="font-size:13.5px;line-height:1.85;color:#2c3e55">
+      《定制化模型研发流程指导》3.2 模型输出数据：<span style="color:var(--muted)">“模型输出字段除风险直接相关字段外，还应包括用于风险排查和模型管理的辅助字段。
+      建议包含共性字段（线索 ID、场景类型、模型编码、模型风险分、模型风险等级）、溯源字段（所属集团名称、所处成员单位名称、采购单号 ID）和个性字段（本项目具体的证据项）。”</span>
+    </div>
+  </div>
+  <div style="margin-top:14px;padding:13px 18px;border:1px dashed #d3dce8;border-radius:10px;font-size:13.5px;color:var(--muted);line-height:1.8">
+    <b style="color:var(--navy)">落到我们的四张表上</b>：共性 → Risk Candidate 的前 5 列（candidate_id 到 risk_level）；
+    溯源 → Candidate 的合同编号与成员单位、Evidence 的 source_record_id；
+    个性 → Business Fact 的金额与比率、Evidence 明细里的源字段取值。
+  </div>
+  <div class="foot"><span>少一类字段，就会有一类问题答不上来：缺共性没法排序，缺溯源不知道找谁，缺个性没法复核</span><span class="pg"></span></div>
+</section>
+
+<!-- 18 效果 -->
 <section class="slide">
   <div class="tag"><b>效果</b> · 结果长什么样</div>
   <h2>15 条线索，分布在两类形态上</h2>
@@ -620,10 +741,10 @@ open report/任务报告.html</pre>
          先看合同变更是否登记，再看是否重复结算。</p>
     </div>
   </div>
-  <div class="foot"><span>两条线索都能在 out/输出总表.xlsx 里逐字段对上</span><span>15 / 17</span></div>
+  <div class="foot"><span>两条线索都能在 out/输出总表.xlsx 里逐字段对上</span><span class="pg"></span></div>
 </section>
 
-<!-- 16 现场演示 -->
+<!-- 19 现场演示 -->
 <section class="slide">
   <div class="tag"><b>效果</b> · 现场操作</div>
   <h2>报告里做三个动作，说明三件事</h2>
@@ -647,10 +768,10 @@ open report/任务报告.html</pre>
   <div class="card amber" style="margin-top:18px">
     <p style="color:#5c4a2a">如果现场网络不稳，报告是离线的；如果浏览器打不开，直接翻 <code class="inl">out/输出总表.xlsx</code> 的第一张子表。</p>
   </div>
-  <div class="foot"><span>三个动作合计约 2 分钟，建议放在最后</span><span>16 / 17</span></div>
+  <div class="foot"><span>三个动作合计约 2 分钟，建议放在最后</span><span class="pg"></span></div>
 </section>
 
-<!-- 17 收尾 -->
+<!-- 20 收尾 -->
 <section class="slide">
   <div class="tag"><b>收尾</b> · 边界与提问</div>
   <h2>三句话交代边界</h2>
@@ -669,14 +790,14 @@ open report/任务报告.html</pre>
     </div>
   </div>
   <div style="margin-top:22px" class="lead">完整口径见文档第九、十章；命令清单在 <code class="inl">演示/命令清单.md</code>。</div>
-  <div class="foot"><span>谢谢 · 欢迎从任意一步打断提问</span><span>17 / 17</span></div>
+  <div class="foot"><span>谢谢 · 欢迎从任意一步打断提问</span><span class="pg"></span></div>
 </section>
 
 </div></div>
 
 <div id="hud">
   <button id="prev" title="上一页">‹</button>
-  <span id="cnt">1 / 17</span>
+  <span id="cnt">1 / 20</span>
   <button id="next" title="下一页">›</button>
   <button id="fs" title="全屏 (F)">⤢</button>
 </div>
@@ -723,6 +844,13 @@ open report/任务报告.html</pre>
       pre.classList.add('ok');
       setTimeout(()=>pre.classList.remove('ok'), 1200);
     });
+  });
+
+  // 自动页码：新增或删减页后无需手改
+  const total = String(slides.length).padStart(2, '0');
+  slides.forEach((sl, k) => {
+    const pg = sl.querySelector('.foot .pg');
+    if (pg) pg.textContent = String(k + 1).padStart(2, '0') + ' / ' + total;
   });
 
   fit();

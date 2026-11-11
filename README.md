@@ -66,7 +66,7 @@ python3 code/build_report.py      # 4. 生成可交互 HTML 报告
 │   └── clues.json                                    供报告生成使用的中间数据
 ├── report/任务报告.html                              单文件离线报告，双击即开
 └── 演示/                                             投屏演示材料
-    ├── 演示.html                                     HTML 幻灯片（17 页，方向键翻页，F 全屏）
+    ├── 演示.html                                     HTML 幻灯片（20 页，方向键翻页，F 全屏）
     ├── 演示.ipynb                                    Jupyter 逐步演示（4 步 14 单元）
     └── 命令清单.md                                    一页纸命令与排错
 ```
