@@ -473,7 +473,9 @@ def main():
     h1(doc, "七、输出对象（对齐 V2.1）")
     para(doc, "输出按《御风穿透式监管平台·预置模型输入输出数据规范》第四章组织为 6 类对象："
               "Candidate 为唯一模型结果，Reason / Fact / Evidence 用于解释结果，"
-              "另有原因-证据关联表与执行元数据。不再是单张宽表。")
+              "另有原因-证据关联表与执行元数据。不再是单张宽表。"
+              "为便于提交与评审，四类核心对象另合并为一个工作簿 out/输出总表.xlsx，"
+              "按对象分 4 张工作表，列与本节字段一一对应，不额外增加列。")
     add_table(doc, ["对象", "基数", "本模型取值"], [
         ["Risk Candidate", "一条线索一个", "15 个，按「规则编号 + 合同编号」唯一"],
         ["Reason", "一个 Candidate 1–2 条", "15 条，按命中方向分支"],
@@ -585,8 +587,12 @@ def main():
         ["原因-证据关联", "25", "out/explanation_evidence_rel.csv"],
         ["执行元数据", "1", "out/execution.csv"],
         ["明细数据集", "25 个文件", "out/evidence/EV-*.csv"],
+        ["合并总表", "1 个工作簿 / 4 张子表", "out/输出总表.xlsx"],
     ], [4.0, 3.0, 9.6])
-    para(doc, "out/线索汇总_人读视图.csv 由 Candidate 与 Fact 派生，仅供人工翻阅，不作为规范交付物。",
+    para(doc, "out/输出总表.xlsx 含 Risk Candidate / Reason / Business Fact / Evidence Set 四张工作表，"
+              "分别为 20 / 9 / 18 / 9 列，与 V2.1 第四章字段数一致；金额列两位小数、比例列十位小数，"
+              "数值以数值型存储便于筛选与汇总。out/线索汇总_人读视图.csv 由 Candidate 与 Fact 派生，"
+              "仅供人工翻阅，不作为规范交付物。",
          "宋体", 9, False, GREY, before=2)
 
     h1(doc, "八、效果评估标准与验收口径")

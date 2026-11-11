@@ -249,6 +249,77 @@ def _w(path, head, rows):
         w.writerows(rows)
 
 
+
+
+NUM_COLS = {"numeric_value", "risk_score", "risk_amount", "record_count", "display_order"}
+def _vis_len(v):
+    """按东亚字符占两格估算显示宽度"""
+    if v is None:
+        return 0
+    return sum(2 if ord(ch) > 127 else 1 for ch in str(v))
+
+
+NUM_FMT = {"risk_score": "0.0", "risk_amount": "#,##0.00",
+           "record_count": "0", "display_order": "0"}
+
+
+def write_xlsx(path, sheets):
+    """把多张子表写入一个工作簿，每类对象一张工作表；列与 V2.1 字段一一对应，不额外加列"""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, Alignment, PatternFill
+        from openpyxl.utils import get_column_letter
+    except ImportError:
+        log("    [SKIP] 未安装 openpyxl，跳过 XLSX 总表（其余输出不受影响）")
+        return False
+
+    wb = Workbook()
+    wb.remove(wb.active)
+    head_font = Font(bold=True, color="FFFFFF", size=10)
+    head_fill = PatternFill("solid", fgColor="1C3557")
+    for name, head, rows in sheets:
+        ws = wb.create_sheet(name)
+        ws.append(head)
+        for r in rows:
+            vals = []
+            for h, v in zip(head, r):
+                if h in NUM_COLS and v not in ("", None):
+                    try:
+                        vals.append(float(v))
+                        continue
+                    except (TypeError, ValueError):
+                        pass
+                vals.append(v)
+            ws.append(vals)
+        for c in ws[1]:
+            c.font = head_font
+            c.fill = head_fill
+            c.alignment = Alignment(horizontal="center", vertical="center")
+        ws.freeze_panes = "A2"
+        ws.auto_filter.ref = ws.dimensions
+        for h, fmt in NUM_FMT.items():
+            if h in head:
+                ci = head.index(h) + 1
+                for r in range(2, ws.max_row + 1):
+                    ws.cell(row=r, column=ci).number_format = fmt
+        if "numeric_value" in head and "unit" in head:
+            ui, ni = head.index("unit") + 1, head.index("numeric_value") + 1
+            for r in range(2, ws.max_row + 1):
+                u = ws.cell(row=r, column=ui).value
+                ws.cell(row=r, column=ni).number_format = (
+                    "#,##0.00" if u == "CNY" else "0.0000000000" if u == "ratio" else "General")
+        from openpyxl.worksheet.properties import PageSetupProperties
+        for i, h in enumerate(head, 1):
+            est = _vis_len(h)
+            for rr in range(2, min(ws.max_row, 30) + 1):
+                est = max(est, _vis_len(ws.cell(row=rr, column=i).value))
+            ws.column_dimensions[get_column_letter(i)].width = min(46, max(11, est + 2))
+        ws.page_setup.orientation = "landscape"
+        ws.print_title_rows = "1:1"
+    wb.save(path)
+    return True
+
+
 def emit_v21(clues, contracts, inv_by_code, p):
     """按 V2.1 第四章生成输出对象，返回各类计数"""
     import shutil
@@ -485,6 +556,14 @@ def main():
     # ---------- 输出 ----------
     v21 = emit_v21(clues, contracts, inv_by_code, p)
 
+    # 四类对象合并为一个工作簿：每类对象一张子表，列严格照 V2.1
+    ok_xlsx = write_xlsx(os.path.join(OUT, "输出总表.xlsx"), [
+        ("Risk Candidate", list(v21["_cand"][0].keys()), [list(x.values()) for x in v21["_cand"]]),
+        ("Reason", list(v21["_reason"][0].keys()), [list(x.values()) for x in v21["_reason"]]),
+        ("Business Fact", list(v21["_fact"][0].keys()), [list(x.values()) for x in v21["_fact"]]),
+        ("Evidence Set", list(v21["_set"][0].keys()), [list(x.values()) for x in v21["_set"]]),
+    ])
+
     # 人读视图（由 Candidate + Fact 派生，非 V2.1 规范交付物）
     head = ["线索ID", "规则编号", "规则名称", "合同编号", "合同名称", "成员单位",
             "合同类型", "合同金额C1", "已结算金额E1", "累计发票金额B2", "累计支付金额S2",
@@ -584,6 +663,8 @@ def main():
           f"Detail {v21['evidence_details']} ｜ 关联 {v21['rels']}")
     print("  文件：out/candidate.csv、reason.csv、fact.csv、evidence_set.csv、"
           "evidence_detail.csv、explanation_evidence_rel.csv、execution.csv、evidence/")
+    if ok_xlsx:
+        print("  总表：out/输出总表.xlsx（4 张子表：Risk Candidate / Reason / Business Fact / Evidence Set）")
 
 
 if __name__ == "__main__":

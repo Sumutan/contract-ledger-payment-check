@@ -48,6 +48,7 @@ python3 code/build_report.py      # 4. 生成可交互 HTML 报告
 │   ├── hive/                                         平台版：01 清洗 / 02 特征 / 03 规则预览
 │   └── sqlite/                                       本地可执行版，供 run_sql_check 调用
 ├── out/
+│   ├── 输出总表.xlsx                                  四类对象合并总表（4 张子表，列同 V2.1）
 │   ├── candidate.csv                                 Risk Candidate（15 个，V2.1 §4.2 全字段）
 │   ├── reason.csv                                    Reason（15 条，§4.3）
 │   ├── fact.csv                                      Business Fact（85 条，§4.4）
